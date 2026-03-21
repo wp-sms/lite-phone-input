@@ -442,4 +442,66 @@ describe('PhoneInput', () => {
       phone.destroy();
     });
   });
+
+  describe('Android + key fallback', () => {
+    it('strips + in separateDialCode strict mode', () => {
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        separateDialCode: true,
+      });
+
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+      input.value = '+';
+      input.dispatchEvent(new InputEvent('input', { data: '+', bubbles: true }));
+
+      expect(input.value).not.toContain('+');
+
+      phone.destroy();
+    });
+
+    it('preserves + in inline mode', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+      input.value = '+1202';
+      input.dispatchEvent(new InputEvent('input', { data: '+', bubbles: true }));
+
+      expect(input.value.startsWith('+')).toBe(true);
+
+      phone.destroy();
+    });
+
+    it('does not strip + when strict is false', () => {
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        separateDialCode: true,
+        strict: false,
+      });
+
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+      input.value = '+202';
+      input.dispatchEvent(new InputEvent('input', { data: '+', bubbles: true }));
+
+      // + is removed by digit extraction regardless of strict mode
+      expect(input.value).not.toContain('+');
+
+      phone.destroy();
+    });
+
+    it('strips + mixed with digits in separateDialCode', () => {
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        separateDialCode: true,
+      });
+
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+      input.value = '20+2';
+      input.dispatchEvent(new InputEvent('input', { data: '+', bubbles: true }));
+
+      expect(input.value).not.toContain('+');
+      expect(input.value.replace(/\s/g, '')).toContain('202');
+
+      phone.destroy();
+    });
+  });
 });

@@ -4,6 +4,8 @@ import {
   processCountryData,
   getCountryByCode,
   getCountryByDialCode,
+  getAllCountries,
+  getNationalNumber,
 } from '../../src/core/countries';
 import type { Country, CountryData } from '../../src/core/types';
 
@@ -87,5 +89,61 @@ describe('getCountryByDialCode', () => {
 
   it('returns undefined when no match', () => {
     expect(getCountryByDialCode(countries, '999')).toBeUndefined();
+  });
+});
+
+describe('getAllCountries', () => {
+  it('returns all 245 countries', () => {
+    expect(getAllCountries()).toHaveLength(245);
+  });
+
+  it('returns same reference (singleton)', () => {
+    expect(getAllCountries()).toBe(getAllCountries());
+  });
+
+  it('entries have all Country fields', () => {
+    const first = getAllCountries()[0];
+    expect(first).toHaveProperty('code');
+    expect(first).toHaveProperty('name');
+    expect(first).toHaveProperty('dialCode');
+    expect(first).toHaveProperty('format');
+    expect(first).toHaveProperty('nationalPrefix');
+    expect(first).toHaveProperty('minLength');
+    expect(first).toHaveProperty('maxLength');
+    expect(first).toHaveProperty('priority');
+  });
+});
+
+describe('getNationalNumber', () => {
+  it('returns empty string for empty input', () => {
+    expect(getNationalNumber('')).toBe('');
+  });
+
+  it('strips 1-digit dial code (US +1)', () => {
+    expect(getNationalNumber('+12025551234')).toBe('2025551234');
+  });
+
+  it('strips 2-digit dial code (GB +44)', () => {
+    expect(getNationalNumber('+442071234567')).toBe('2071234567');
+  });
+
+  it('strips 3-digit dial code (Albania +355)', () => {
+    expect(getNationalNumber('+355691234567')).toBe('691234567');
+  });
+
+  it('strips national prefix after dial code', () => {
+    expect(getNationalNumber('+4402071234567')).toBe('2071234567');
+  });
+
+  it('keeps national prefix when stripping would empty', () => {
+    expect(getNationalNumber('+440')).toBe('0');
+  });
+
+  it('uses explicit countryCode parameter', () => {
+    expect(getNationalNumber('+442071234567', 'GB')).toBe('2071234567');
+  });
+
+  it('returns raw digits when no country matches', () => {
+    expect(getNationalNumber('5551234567')).toBe('5551234567');
   });
 });
