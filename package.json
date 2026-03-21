@@ -1,0 +1,91 @@
+{
+  "name": "lite-phone-input",
+  "version": "0.1.0",
+  "description": "Lightweight phone input with formatting, validation, and emoji flags — ~13KB gzipped",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js",
+      "require": "./dist/core/index.cjs"
+    },
+    "./vanilla": {
+      "types": "./dist/vanilla/index.d.ts",
+      "import": "./dist/vanilla/index.js",
+      "require": "./dist/vanilla/index.cjs"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js",
+      "require": "./dist/react/index.cjs"
+    },
+    "./preact": {
+      "types": "./dist/preact/index.d.ts",
+      "import": "./dist/preact/index.js",
+      "require": "./dist/preact/index.cjs"
+    },
+    "./styles": "./dist/styles.css",
+    "./data": "./data/phone-countries.json"
+  },
+  "main": "./dist/core/index.cjs",
+  "module": "./dist/core/index.js",
+  "types": "./dist/core/index.d.ts",
+  "files": [
+    "dist",
+    "data"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "generate-data": "node scripts/generate-data.mjs",
+    "size": "npm run build && size-limit",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "preact": ">=10",
+    "react": ">=17"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "preact": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "jsdom": "^29.0.1",
+    "preact": "^10.29.0",
+    "react": "^19.2.4",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  },
+  "keywords": [
+    "phone",
+    "input",
+    "telephone",
+    "international",
+    "country",
+    "dial-code",
+    "e164",
+    "formatting",
+    "validation",
+    "emoji-flags",
+    "lightweight"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/user/lite-phone-input"
+  },
+  "sideEffects": [
+    "*.css"
+  ]
+}
