@@ -1,0 +1,2452 @@
+[
+  {
+    "c": "AF",
+    "n": "Afghanistan",
+    "d": "93",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "AX",
+    "n": "Åland Islands",
+    "d": "358",
+    "f": "XX XXXXXXX",
+    "p": "0",
+    "min": 6,
+    "max": 10,
+    "pri": 1
+  },
+  {
+    "c": "AL",
+    "n": "Albania",
+    "d": "355",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "DZ",
+    "n": "Algeria",
+    "d": "213",
+    "f": "XXX XX XX XX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "AS",
+    "n": "American Samoa",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 3
+  },
+  {
+    "c": "AD",
+    "n": "Andorra",
+    "d": "376",
+    "f": "XXX XXX",
+    "p": null,
+    "min": 6,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "AO",
+    "n": "Angola",
+    "d": "244",
+    "f": "XXX XXX XXX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "AI",
+    "n": "Anguilla",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 2
+  },
+  {
+    "c": "AG",
+    "n": "Antigua & Barbuda",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 1
+  },
+  {
+    "c": "AR",
+    "n": "Argentina",
+    "d": "54",
+    "f": "XX XX XXXX XXXX",
+    "p": "0",
+    "min": 10,
+    "max": 11,
+    "pri": 0
+  },
+  {
+    "c": "AM",
+    "n": "Armenia",
+    "d": "374",
+    "f": "XX XXXXXX",
+    "p": "0",
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "AW",
+    "n": "Aruba",
+    "d": "297",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "AC",
+    "n": "Ascension Island",
+    "d": "247",
+    "f": null,
+    "p": null,
+    "min": 5,
+    "max": 5,
+    "pri": 0
+  },
+  {
+    "c": "AU",
+    "n": "Australia",
+    "d": "61",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "AT",
+    "n": "Austria",
+    "d": "43",
+    "f": "XXX XXXXXX",
+    "p": "0",
+    "min": 4,
+    "max": 13,
+    "pri": 0
+  },
+  {
+    "c": "AZ",
+    "n": "Azerbaijan",
+    "d": "994",
+    "f": "XX XXX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "BS",
+    "n": "Bahamas",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 6
+  },
+  {
+    "c": "BH",
+    "n": "Bahrain",
+    "d": "973",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "BD",
+    "n": "Bangladesh",
+    "d": "880",
+    "f": "XXXX XXXXXX",
+    "p": "0",
+    "min": 6,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "BB",
+    "n": "Barbados",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 4
+  },
+  {
+    "c": "BY",
+    "n": "Belarus",
+    "d": "375",
+    "f": "XX XXX XX XX",
+    "p": "8",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "BE",
+    "n": "Belgium",
+    "d": "32",
+    "f": "XXX XX XX XX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "BZ",
+    "n": "Belize",
+    "d": "501",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "BJ",
+    "n": "Benin",
+    "d": "229",
+    "f": "XX XX XX XX XX",
+    "p": null,
+    "min": 10,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "BM",
+    "n": "Bermuda",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 5
+  },
+  {
+    "c": "BT",
+    "n": "Bhutan",
+    "d": "975",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 7,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "BO",
+    "n": "Bolivia",
+    "d": "591",
+    "f": "XXXXXXXX",
+    "p": "0",
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "BA",
+    "n": "Bosnia & Herzegovina",
+    "d": "387",
+    "f": "XX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "BW",
+    "n": "Botswana",
+    "d": "267",
+    "f": "XX XXX XXX",
+    "p": null,
+    "min": 7,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "BR",
+    "n": "Brazil",
+    "d": "55",
+    "f": "XX XXXXX XXXX",
+    "p": "0",
+    "min": 10,
+    "max": 11,
+    "pri": 0
+  },
+  {
+    "c": "IO",
+    "n": "British Indian Ocean Territory",
+    "d": "246",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "VG",
+    "n": "British Virgin Islands",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 23
+  },
+  {
+    "c": "BN",
+    "n": "Brunei",
+    "d": "673",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "BG",
+    "n": "Bulgaria",
+    "d": "359",
+    "f": "XX XXX XXX",
+    "p": "0",
+    "min": 6,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "BF",
+    "n": "Burkina Faso",
+    "d": "226",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "BI",
+    "n": "Burundi",
+    "d": "257",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "KH",
+    "n": "Cambodia",
+    "d": "855",
+    "f": "XX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "CM",
+    "n": "Cameroon",
+    "d": "237",
+    "f": "X XX XX XX XX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "CA",
+    "n": "Canada",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 7
+  },
+  {
+    "c": "CV",
+    "n": "Cape Verde",
+    "d": "238",
+    "f": "XXX XX XX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "BQ",
+    "n": "Caribbean Netherlands",
+    "d": "599",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 1
+  },
+  {
+    "c": "KY",
+    "n": "Cayman Islands",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 14
+  },
+  {
+    "c": "CF",
+    "n": "Central African Republic",
+    "d": "236",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "TD",
+    "n": "Chad",
+    "d": "235",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "CL",
+    "n": "Chile",
+    "d": "56",
+    "f": "X XXXX XXXX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "CN",
+    "n": "China",
+    "d": "86",
+    "f": "XXX XXXX XXXX",
+    "p": "0",
+    "min": 7,
+    "max": 11,
+    "pri": 0
+  },
+  {
+    "c": "CX",
+    "n": "Christmas Island",
+    "d": "61",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 2
+  },
+  {
+    "c": "CC",
+    "n": "Cocos (Keeling) Islands",
+    "d": "61",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 1
+  },
+  {
+    "c": "CO",
+    "n": "Colombia",
+    "d": "57",
+    "f": "XXX XXXXXXX",
+    "p": "0",
+    "min": 8,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "KM",
+    "n": "Comoros",
+    "d": "269",
+    "f": "XXX XX XX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "CG",
+    "n": "Congo - Brazzaville",
+    "d": "242",
+    "f": "XX XXX XXXX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "CD",
+    "n": "Congo - Kinshasa",
+    "d": "243",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 7,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "CK",
+    "n": "Cook Islands",
+    "d": "682",
+    "f": "XX XXX",
+    "p": null,
+    "min": 5,
+    "max": 5,
+    "pri": 0
+  },
+  {
+    "c": "CR",
+    "n": "Costa Rica",
+    "d": "506",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "CI",
+    "n": "Côte d’Ivoire",
+    "d": "225",
+    "f": "XX XX XX XXXX",
+    "p": null,
+    "min": 10,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "HR",
+    "n": "Croatia",
+    "d": "385",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "CU",
+    "n": "Cuba",
+    "d": "53",
+    "f": "X XXXXXXX",
+    "p": "0",
+    "min": 6,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "CW",
+    "n": "Curaçao",
+    "d": "599",
+    "f": "X XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "CY",
+    "n": "Cyprus",
+    "d": "357",
+    "f": "XX XXXXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "CZ",
+    "n": "Czechia",
+    "d": "420",
+    "f": "XXX XXX XXX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "DK",
+    "n": "Denmark",
+    "d": "45",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "DJ",
+    "n": "Djibouti",
+    "d": "253",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "DM",
+    "n": "Dominica",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 8
+  },
+  {
+    "c": "DO",
+    "n": "Dominican Republic",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 9
+  },
+  {
+    "c": "EC",
+    "n": "Ecuador",
+    "d": "593",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "EG",
+    "n": "Egypt",
+    "d": "20",
+    "f": "XX XXXXXXXX",
+    "p": "0",
+    "min": 8,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "SV",
+    "n": "El Salvador",
+    "d": "503",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "GQ",
+    "n": "Equatorial Guinea",
+    "d": "240",
+    "f": "XXX XXX XXX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "ER",
+    "n": "Eritrea",
+    "d": "291",
+    "f": "X XXX XXX",
+    "p": "0",
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "EE",
+    "n": "Estonia",
+    "d": "372",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "SZ",
+    "n": "Eswatini",
+    "d": "268",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "ET",
+    "n": "Ethiopia",
+    "d": "251",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "FK",
+    "n": "Falkland Islands",
+    "d": "500",
+    "f": null,
+    "p": null,
+    "min": 5,
+    "max": 5,
+    "pri": 0
+  },
+  {
+    "c": "FO",
+    "n": "Faroe Islands",
+    "d": "298",
+    "f": "XXXXXX",
+    "p": null,
+    "min": 6,
+    "max": 6,
+    "pri": 0
+  },
+  {
+    "c": "FJ",
+    "n": "Fiji",
+    "d": "679",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "FI",
+    "n": "Finland",
+    "d": "358",
+    "f": "XX XXXXXXX",
+    "p": "0",
+    "min": 5,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "FR",
+    "n": "France",
+    "d": "33",
+    "f": "X XX XX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "GF",
+    "n": "French Guiana",
+    "d": "594",
+    "f": "XXX XX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "PF",
+    "n": "French Polynesia",
+    "d": "689",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "GA",
+    "n": "Gabon",
+    "d": "241",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 7,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "GM",
+    "n": "Gambia",
+    "d": "220",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "GE",
+    "n": "Georgia",
+    "d": "995",
+    "f": "XXX XX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "DE",
+    "n": "Germany",
+    "d": "49",
+    "f": "XXXX XXXXXXX",
+    "p": "0",
+    "min": 5,
+    "max": 15,
+    "pri": 0
+  },
+  {
+    "c": "GH",
+    "n": "Ghana",
+    "d": "233",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "GI",
+    "n": "Gibraltar",
+    "d": "350",
+    "f": "XXX XXXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "GR",
+    "n": "Greece",
+    "d": "30",
+    "f": "XXX XXX XXXX",
+    "p": null,
+    "min": 10,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "GL",
+    "n": "Greenland",
+    "d": "299",
+    "f": "XX XX XX",
+    "p": null,
+    "min": 6,
+    "max": 6,
+    "pri": 0
+  },
+  {
+    "c": "GD",
+    "n": "Grenada",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 10
+  },
+  {
+    "c": "GP",
+    "n": "Guadeloupe",
+    "d": "590",
+    "f": "XXX XX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "GU",
+    "n": "Guam",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 11
+  },
+  {
+    "c": "GT",
+    "n": "Guatemala",
+    "d": "502",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "GG",
+    "n": "Guernsey",
+    "d": "44",
+    "f": "XXXX XXXXXX",
+    "p": "0",
+    "min": 10,
+    "max": 10,
+    "pri": 1
+  },
+  {
+    "c": "GN",
+    "n": "Guinea",
+    "d": "224",
+    "f": "XXX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "GW",
+    "n": "Guinea-Bissau",
+    "d": "245",
+    "f": "XXX XXX XXX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "GY",
+    "n": "Guyana",
+    "d": "592",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "HT",
+    "n": "Haiti",
+    "d": "509",
+    "f": "XX XX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "HN",
+    "n": "Honduras",
+    "d": "504",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "HK",
+    "n": "Hong Kong SAR China",
+    "d": "852",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "HU",
+    "n": "Hungary",
+    "d": "36",
+    "f": "XX XXX XXXX",
+    "p": "06",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "IS",
+    "n": "Iceland",
+    "d": "354",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "IN",
+    "n": "India",
+    "d": "91",
+    "f": "XXXXX XXXXX",
+    "p": "0",
+    "min": 10,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "ID",
+    "n": "Indonesia",
+    "d": "62",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 7,
+    "max": 12,
+    "pri": 0
+  },
+  {
+    "c": "IR",
+    "n": "Iran",
+    "d": "98",
+    "f": "XXX XXX XXXX",
+    "p": "0",
+    "min": 6,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "IQ",
+    "n": "Iraq",
+    "d": "964",
+    "f": "XXX XXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "IE",
+    "n": "Ireland",
+    "d": "353",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 7,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "IM",
+    "n": "Isle of Man",
+    "d": "44",
+    "f": "XXXX XXXXXX",
+    "p": "0",
+    "min": 10,
+    "max": 10,
+    "pri": 2
+  },
+  {
+    "c": "IL",
+    "n": "Israel",
+    "d": "972",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 12,
+    "pri": 0
+  },
+  {
+    "c": "IT",
+    "n": "Italy",
+    "d": "39",
+    "f": "XXX XXX XXXX",
+    "p": null,
+    "min": 6,
+    "max": 12,
+    "pri": 0
+  },
+  {
+    "c": "JM",
+    "n": "Jamaica",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 12
+  },
+  {
+    "c": "JP",
+    "n": "Japan",
+    "d": "81",
+    "f": "XX XXXX XXXX",
+    "p": "0",
+    "min": 9,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "JE",
+    "n": "Jersey",
+    "d": "44",
+    "f": "XXXX XXXXXX",
+    "p": "0",
+    "min": 10,
+    "max": 10,
+    "pri": 3
+  },
+  {
+    "c": "JO",
+    "n": "Jordan",
+    "d": "962",
+    "f": "X XXXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "KZ",
+    "n": "Kazakhstan",
+    "d": "7",
+    "f": "XXX XXX XXXX",
+    "p": "8",
+    "min": 10,
+    "max": 10,
+    "pri": 1
+  },
+  {
+    "c": "KE",
+    "n": "Kenya",
+    "d": "254",
+    "f": "XXX XXXXXX",
+    "p": "0",
+    "min": 7,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "KI",
+    "n": "Kiribati",
+    "d": "686",
+    "f": null,
+    "p": "0",
+    "min": 5,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "XK",
+    "n": "Kosovo",
+    "d": "383",
+    "f": "XX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 12,
+    "pri": 0
+  },
+  {
+    "c": "KW",
+    "n": "Kuwait",
+    "d": "965",
+    "f": "XXX XXXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "KG",
+    "n": "Kyrgyzstan",
+    "d": "996",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "LA",
+    "n": "Laos",
+    "d": "856",
+    "f": "XX XX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "LV",
+    "n": "Latvia",
+    "d": "371",
+    "f": "XX XXX XXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "LB",
+    "n": "Lebanon",
+    "d": "961",
+    "f": "XX XXX XXX",
+    "p": "0",
+    "min": 7,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "LS",
+    "n": "Lesotho",
+    "d": "266",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "LR",
+    "n": "Liberia",
+    "d": "231",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 7,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "LY",
+    "n": "Libya",
+    "d": "218",
+    "f": "XX XXXXXXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "LI",
+    "n": "Liechtenstein",
+    "d": "423",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 7,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "LT",
+    "n": "Lithuania",
+    "d": "370",
+    "f": "XXX XXXXX",
+    "p": "0",
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "LU",
+    "n": "Luxembourg",
+    "d": "352",
+    "f": "XXX XXX XXX",
+    "p": null,
+    "min": 4,
+    "max": 11,
+    "pri": 0
+  },
+  {
+    "c": "MO",
+    "n": "Macao SAR China",
+    "d": "853",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "MG",
+    "n": "Madagascar",
+    "d": "261",
+    "f": "XX XX XXX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "MW",
+    "n": "Malawi",
+    "d": "265",
+    "f": "XXX XX XX XX",
+    "p": "0",
+    "min": 7,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "MY",
+    "n": "Malaysia",
+    "d": "60",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "MV",
+    "n": "Maldives",
+    "d": "960",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "ML",
+    "n": "Mali",
+    "d": "223",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "MT",
+    "n": "Malta",
+    "d": "356",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "MH",
+    "n": "Marshall Islands",
+    "d": "692",
+    "f": "XXX XXXX",
+    "p": "1",
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "MQ",
+    "n": "Martinique",
+    "d": "596",
+    "f": "XXX XX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "MR",
+    "n": "Mauritania",
+    "d": "222",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "MU",
+    "n": "Mauritius",
+    "d": "230",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "YT",
+    "n": "Mayotte",
+    "d": "262",
+    "f": "XXX XX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 1
+  },
+  {
+    "c": "MX",
+    "n": "Mexico",
+    "d": "52",
+    "f": "XXX XXX XXXX",
+    "p": null,
+    "min": 10,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "FM",
+    "n": "Micronesia",
+    "d": "691",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "MD",
+    "n": "Moldova",
+    "d": "373",
+    "f": "XXX XX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "MC",
+    "n": "Monaco",
+    "d": "377",
+    "f": "X XX XX XX XX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "MN",
+    "n": "Mongolia",
+    "d": "976",
+    "f": "XXXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "ME",
+    "n": "Montenegro",
+    "d": "382",
+    "f": "XX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "MS",
+    "n": "Montserrat",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 17
+  },
+  {
+    "c": "MA",
+    "n": "Morocco",
+    "d": "212",
+    "f": "X XX XX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "MZ",
+    "n": "Mozambique",
+    "d": "258",
+    "f": "XX XXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "MM",
+    "n": "Myanmar (Burma)",
+    "d": "95",
+    "f": "X XXX XXXX",
+    "p": "0",
+    "min": 6,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "NA",
+    "n": "Namibia",
+    "d": "264",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "NR",
+    "n": "Nauru",
+    "d": "674",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "NP",
+    "n": "Nepal",
+    "d": "977",
+    "f": "XXX XXXXXXX",
+    "p": "0",
+    "min": 8,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "NL",
+    "n": "Netherlands",
+    "d": "31",
+    "f": "X XXXXXXXX",
+    "p": "0",
+    "min": 9,
+    "max": 11,
+    "pri": 0
+  },
+  {
+    "c": "NC",
+    "n": "New Caledonia",
+    "d": "687",
+    "f": "XX XX XX",
+    "p": null,
+    "min": 6,
+    "max": 6,
+    "pri": 0
+  },
+  {
+    "c": "NZ",
+    "n": "New Zealand",
+    "d": "64",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "NI",
+    "n": "Nicaragua",
+    "d": "505",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "NE",
+    "n": "Niger",
+    "d": "227",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "NG",
+    "n": "Nigeria",
+    "d": "234",
+    "f": "XXX XXX XXXX",
+    "p": "0",
+    "min": 10,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "NU",
+    "n": "Niue",
+    "d": "683",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 4,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "NF",
+    "n": "Norfolk Island",
+    "d": "672",
+    "f": "X XXXXX",
+    "p": null,
+    "min": 6,
+    "max": 6,
+    "pri": 0
+  },
+  {
+    "c": "KP",
+    "n": "North Korea",
+    "d": "850",
+    "f": "XXX XXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "MK",
+    "n": "North Macedonia",
+    "d": "389",
+    "f": "XX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "MP",
+    "n": "Northern Mariana Islands",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 16
+  },
+  {
+    "c": "NO",
+    "n": "Norway",
+    "d": "47",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "OM",
+    "n": "Oman",
+    "d": "968",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "PK",
+    "n": "Pakistan",
+    "d": "92",
+    "f": "XXX XXXXXXX",
+    "p": "0",
+    "min": 9,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "PW",
+    "n": "Palau",
+    "d": "680",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "PS",
+    "n": "Palestinian Territories",
+    "d": "970",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "PA",
+    "n": "Panama",
+    "d": "507",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "PG",
+    "n": "Papua New Guinea",
+    "d": "675",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "PY",
+    "n": "Paraguay",
+    "d": "595",
+    "f": "XXX XXXXXX",
+    "p": "0",
+    "min": 7,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "PE",
+    "n": "Peru",
+    "d": "51",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "PH",
+    "n": "Philippines",
+    "d": "63",
+    "f": "XXX XXX XXXX",
+    "p": "0",
+    "min": 6,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "PL",
+    "n": "Poland",
+    "d": "48",
+    "f": "XXX XXX XXX",
+    "p": null,
+    "min": 7,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "PT",
+    "n": "Portugal",
+    "d": "351",
+    "f": "XXX XXX XXX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "PR",
+    "n": "Puerto Rico",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 18
+  },
+  {
+    "c": "QA",
+    "n": "Qatar",
+    "d": "974",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "RE",
+    "n": "Réunion",
+    "d": "262",
+    "f": "XXX XX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "RO",
+    "n": "Romania",
+    "d": "40",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 6,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "RU",
+    "n": "Russia",
+    "d": "7",
+    "f": "XXX XXX XX XX",
+    "p": "8",
+    "min": 10,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "RW",
+    "n": "Rwanda",
+    "d": "250",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "WS",
+    "n": "Samoa",
+    "d": "685",
+    "f": "XX XXXXX",
+    "p": null,
+    "min": 5,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "SM",
+    "n": "San Marino",
+    "d": "378",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "ST",
+    "n": "São Tomé & Príncipe",
+    "d": "239",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "SA",
+    "n": "Saudi Arabia",
+    "d": "966",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "SN",
+    "n": "Senegal",
+    "d": "221",
+    "f": "XX XXX XX XX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "RS",
+    "n": "Serbia",
+    "d": "381",
+    "f": "XX XXXXXXX",
+    "p": "0",
+    "min": 7,
+    "max": 12,
+    "pri": 0
+  },
+  {
+    "c": "SC",
+    "n": "Seychelles",
+    "d": "248",
+    "f": "X XXX XXX",
+    "p": null,
+    "min": 7,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "SL",
+    "n": "Sierra Leone",
+    "d": "232",
+    "f": "XX XXXXXX",
+    "p": "0",
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "SG",
+    "n": "Singapore",
+    "d": "65",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "SX",
+    "n": "Sint Maarten",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 19
+  },
+  {
+    "c": "SK",
+    "n": "Slovakia",
+    "d": "421",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 6,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "SI",
+    "n": "Slovenia",
+    "d": "386",
+    "f": "XX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "SB",
+    "n": "Solomon Islands",
+    "d": "677",
+    "f": "XX XXXXX",
+    "p": null,
+    "min": 5,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "SO",
+    "n": "Somalia",
+    "d": "252",
+    "f": "X XXXXXXX",
+    "p": "0",
+    "min": 6,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "ZA",
+    "n": "South Africa",
+    "d": "27",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 5,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "KR",
+    "n": "South Korea",
+    "d": "82",
+    "f": "XXXX XXXX",
+    "p": "0",
+    "min": 5,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "SS",
+    "n": "South Sudan",
+    "d": "211",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "ES",
+    "n": "Spain",
+    "d": "34",
+    "f": "XXX XX XX XX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "LK",
+    "n": "Sri Lanka",
+    "d": "94",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "BL",
+    "n": "St. Barthélemy",
+    "d": "590",
+    "f": "XXX XX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 1
+  },
+  {
+    "c": "SH",
+    "n": "St. Helena",
+    "d": "290",
+    "f": null,
+    "p": null,
+    "min": 4,
+    "max": 5,
+    "pri": 0
+  },
+  {
+    "c": "KN",
+    "n": "St. Kitts & Nevis",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 13
+  },
+  {
+    "c": "LC",
+    "n": "St. Lucia",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 15
+  },
+  {
+    "c": "MF",
+    "n": "St. Martin",
+    "d": "590",
+    "f": "XXX XX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 2
+  },
+  {
+    "c": "PM",
+    "n": "St. Pierre & Miquelon",
+    "d": "508",
+    "f": "XX XX XX",
+    "p": "0",
+    "min": 6,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "VC",
+    "n": "St. Vincent & Grenadines",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 22
+  },
+  {
+    "c": "SD",
+    "n": "Sudan",
+    "d": "249",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "SR",
+    "n": "Suriname",
+    "d": "597",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 6,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "SJ",
+    "n": "Svalbard & Jan Mayen",
+    "d": "47",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 1
+  },
+  {
+    "c": "SE",
+    "n": "Sweden",
+    "d": "46",
+    "f": "XX XXX XX XX",
+    "p": "0",
+    "min": 7,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "CH",
+    "n": "Switzerland",
+    "d": "41",
+    "f": "XX XXX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "SY",
+    "n": "Syria",
+    "d": "963",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "TW",
+    "n": "Taiwan",
+    "d": "886",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "TJ",
+    "n": "Tajikistan",
+    "d": "992",
+    "f": "XX XXX XXXX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "TZ",
+    "n": "Tanzania",
+    "d": "255",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "TH",
+    "n": "Thailand",
+    "d": "66",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "TL",
+    "n": "Timor-Leste",
+    "d": "670",
+    "f": "XXXX XXXX",
+    "p": null,
+    "min": 7,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "TG",
+    "n": "Togo",
+    "d": "228",
+    "f": "XX XX XX XX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "TK",
+    "n": "Tokelau",
+    "d": "690",
+    "f": null,
+    "p": null,
+    "min": 4,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "TO",
+    "n": "Tonga",
+    "d": "676",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 5,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "TT",
+    "n": "Trinidad & Tobago",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 21
+  },
+  {
+    "c": "TA",
+    "n": "Tristan da Cunha",
+    "d": "290",
+    "f": null,
+    "p": null,
+    "min": 4,
+    "max": 4,
+    "pri": 1
+  },
+  {
+    "c": "TN",
+    "n": "Tunisia",
+    "d": "216",
+    "f": "XX XXX XXX",
+    "p": null,
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "TR",
+    "n": "Türkiye",
+    "d": "90",
+    "f": "XXX XXX XX XX",
+    "p": "0",
+    "min": 10,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "TM",
+    "n": "Turkmenistan",
+    "d": "993",
+    "f": "XX XXXXXX",
+    "p": "8",
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "TC",
+    "n": "Turks & Caicos Islands",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 20
+  },
+  {
+    "c": "TV",
+    "n": "Tuvalu",
+    "d": "688",
+    "f": "XX XXXX",
+    "p": null,
+    "min": 5,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "VI",
+    "n": "U.S. Virgin Islands",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 24
+  },
+  {
+    "c": "UG",
+    "n": "Uganda",
+    "d": "256",
+    "f": "XXX XXXXXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "UA",
+    "n": "Ukraine",
+    "d": "380",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "AE",
+    "n": "United Arab Emirates",
+    "d": "971",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 8,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "GB",
+    "n": "United Kingdom",
+    "d": "44",
+    "f": "XXXX XXXXXX",
+    "p": "0",
+    "min": 9,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "US",
+    "n": "United States",
+    "d": "1",
+    "f": "XXX XXX XXXX",
+    "p": "1",
+    "min": 10,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "UY",
+    "n": "Uruguay",
+    "d": "598",
+    "f": "XX XXX XXX",
+    "p": "0",
+    "min": 8,
+    "max": 8,
+    "pri": 0
+  },
+  {
+    "c": "UZ",
+    "n": "Uzbekistan",
+    "d": "998",
+    "f": "XX XXX XX XX",
+    "p": null,
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "VU",
+    "n": "Vanuatu",
+    "d": "678",
+    "f": "XXX XXXX",
+    "p": null,
+    "min": 5,
+    "max": 7,
+    "pri": 0
+  },
+  {
+    "c": "VA",
+    "n": "Vatican City",
+    "d": "39",
+    "f": "XXX XXX XXXX",
+    "p": null,
+    "min": 6,
+    "max": 11,
+    "pri": 1
+  },
+  {
+    "c": "VE",
+    "n": "Venezuela",
+    "d": "58",
+    "f": "XXX XXXXXXX",
+    "p": "0",
+    "min": 10,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "VN",
+    "n": "Vietnam",
+    "d": "84",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 9,
+    "max": 10,
+    "pri": 0
+  },
+  {
+    "c": "WF",
+    "n": "Wallis & Futuna",
+    "d": "681",
+    "f": "XX XX XX",
+    "p": null,
+    "min": 6,
+    "max": 6,
+    "pri": 0
+  },
+  {
+    "c": "EH",
+    "n": "Western Sahara",
+    "d": "212",
+    "f": "X XX XX XX XX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 1
+  },
+  {
+    "c": "YE",
+    "n": "Yemen",
+    "d": "967",
+    "f": "XXX XXX XXX",
+    "p": "0",
+    "min": 7,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "ZM",
+    "n": "Zambia",
+    "d": "260",
+    "f": "XX XXXXXXX",
+    "p": "0",
+    "min": 9,
+    "max": 9,
+    "pri": 0
+  },
+  {
+    "c": "ZW",
+    "n": "Zimbabwe",
+    "d": "263",
+    "f": "XX XXX XXXX",
+    "p": "0",
+    "min": 5,
+    "max": 10,
+    "pri": 0
+  }
+]
