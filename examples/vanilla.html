@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>lite-phone-input — Vanilla JS Example</title>
-  <link rel="stylesheet" href="../src/vanilla/styles.css">
+  <!-- Run `npm run build` first to generate dist/ files -->
+  <link rel="stylesheet" href="../dist/styles.css">
   <style>
     body {
       font-family: system-ui, -apple-system, sans-serif;
@@ -39,10 +40,13 @@
     Valid: <span id="valid">—</span>
   </div>
 
-  <script type="module">
-    import { PhoneInput } from '../src/vanilla/index.ts';
+  <script src="../dist/vanilla/index.global.js"></script>
+  <script>
+    function formatCountry(country) {
+      return country.name + ' (' + country.code + ') +' + country.dialCode;
+    }
 
-    const phone = PhoneInput.mount(document.getElementById('phone-container'), {
+    var phone = LitePhoneInput.PhoneInput.mount(document.getElementById('phone-container'), {
       defaultCountry: 'US',
       separateDialCode: true,
       preferredCountries: ['US', 'GB', 'DE', 'FR'],
@@ -50,17 +54,18 @@
         id: 'phone',
         name: 'phone',
       },
-      onChange(e164, country, validation) {
-        document.getElementById('e164').textContent = e164 || '—';
-        document.getElementById('national').textContent = phone.getNationalNumber() || '—';
-        document.getElementById('country').textContent =
-          `${country.name} (${country.code}) +${country.dialCode}`;
-        document.getElementById('valid').textContent =
-          validation.valid ? 'Yes' : `No — ${validation.reason ?? 'empty'} (${validation.currentDigits}/${validation.minDigits}–${validation.maxDigits})`;
+      onChange: function (e164, country, validation) {
+        document.getElementById('e164').textContent = e164 || '\u2014';
+        document.getElementById('national').textContent = phone.getNationalNumber() || '\u2014';
+        document.getElementById('country').textContent = formatCountry(country);
+        document.getElementById('valid').textContent = validation.valid
+          ? 'Yes'
+          : 'No \u2014 ' + (validation.reason || 'empty') +
+            ' (' + validation.currentDigits + '/' +
+            validation.minDigits + '\u2013' + validation.maxDigits + ')';
       },
-      onCountryChange(country) {
-        document.getElementById('country').textContent =
-          `${country.name} (${country.code}) +${country.dialCode}`;
+      onCountryChange: function (country) {
+        document.getElementById('country').textContent = formatCountry(country);
       },
     });
   </script>

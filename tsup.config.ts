@@ -19,6 +19,7 @@ export default defineConfig([
     clean: true,
     sourcemap: true,
     globalName: 'LitePhoneInput',
+    onSuccess: 'cp src/vanilla/styles.css dist/styles.css',
   },
   // React adapter
   {
