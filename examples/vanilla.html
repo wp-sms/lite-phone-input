@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>lite-phone-input — Vanilla JS Example</title>
+  <link rel="stylesheet" href="../src/vanilla/styles.css">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 480px;
+      margin: 60px auto;
+      padding: 0 20px;
+      color: #333;
+    }
+    h1 { font-size: 1.4rem; }
+    .output {
+      margin-top: 24px;
+      padding: 16px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    label { display: block; margin-bottom: 8px; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <h1>lite-phone-input</h1>
+
+  <label for="phone">Phone number</label>
+  <div id="phone-container"></div>
+
+  <div class="output" id="output">
+    E.164: <span id="e164">—</span><br>
+    National: <span id="national">—</span><br>
+    Country: <span id="country">—</span><br>
+    Valid: <span id="valid">—</span>
+  </div>
+
+  <script type="module">
+    import { PhoneInput } from '../src/vanilla/index.ts';
+
+    const phone = PhoneInput.mount(document.getElementById('phone-container'), {
+      defaultCountry: 'US',
+      separateDialCode: true,
+      preferredCountries: ['US', 'GB', 'DE', 'FR'],
+      inputAttributes: {
+        id: 'phone',
+        name: 'phone',
+      },
+      onChange(e164, country, validation) {
+        document.getElementById('e164').textContent = e164 || '—';
+        document.getElementById('national').textContent = phone.getNationalNumber() || '—';
+        document.getElementById('country').textContent =
+          `${country.name} (${country.code}) +${country.dialCode}`;
+        document.getElementById('valid').textContent =
+          validation.valid ? 'Yes' : `No — ${validation.reason ?? 'empty'} (${validation.currentDigits}/${validation.minDigits}–${validation.maxDigits})`;
+      },
+      onCountryChange(country) {
+        document.getElementById('country').textContent =
+          `${country.name} (${country.code}) +${country.dialCode}`;
+      },
+    });
+  </script>
+</body>
+</html>
