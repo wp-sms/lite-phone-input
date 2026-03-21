@@ -26,7 +26,6 @@ npm test               # Run tests (vitest)
 npm run test:watch     # Run tests in watch mode
 npm run test:coverage  # Run tests with coverage
 npm run typecheck      # TypeScript type checking (tsc --noEmit)
-npm run size           # Check bundle sizes (build + size-limit)
 npm run example        # Build and open vanilla example
 ```
 
@@ -101,7 +100,7 @@ Open an issue describing:
 - **Include tests** for new features and bug fixes
 - **Update types** if you change the public API
 - **Run the full check** before submitting: `npm run typecheck && npm test && npm run build`
-- **Keep bundle size in mind** — run `npm run size` to check impact
+- **Keep bundle size in mind**
 
 ## Code Style
 

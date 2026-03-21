@@ -43,7 +43,6 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
     "generate-data": "node scripts/generate-data.mjs",
-    "size": "npm run build && size-limit",
     "example": "npm run build && open examples/vanilla.html",
     "prepublishOnly": "npm run build"
   },
