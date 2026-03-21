@@ -1,16 +1,8 @@
-import type { Country, CountryData, PhoneInputOptions, ValidationResult } from '../core/types';
-import { processCountryData, getCountryByCode, getCountryByDialCode, getFlag } from '../core/countries';
+import type { Country, PhoneInputOptions, ValidationResult } from '../core/types';
+import { getAllCountries, getCountryByCode, getCountryByDialCode, getFlag } from '../core/countries';
 import { formatPhone, getCursorPosition, extractDigits, normalizeNumerals } from '../core/format';
 import { validatePhone } from '../core/validate';
 import { Dropdown } from './dropdown';
-import rawData from '../../data/phone-countries.json';
-
-// Lazy singleton for processed country data
-let _allCountries: Country[] | null = null;
-function getAllCountries(): Country[] {
-  if (!_allCountries) _allCountries = processCountryData(rawData as CountryData[]);
-  return _allCountries;
-}
 
 const isClient = typeof window !== 'undefined';
 
@@ -265,12 +257,18 @@ export class PhoneInput {
   private attachListeners(): void {
     const signal = this.ac.signal;
 
-    this.inputEl.addEventListener('input', () => this.handleInput(), { signal });
+    this.inputEl.addEventListener('input', (e) => this.handleInput(e as InputEvent), { signal });
     this.inputEl.addEventListener('keydown', (e) => this.handleKeyDown(e), { signal });
     this.inputEl.addEventListener('paste', (e) => this.handlePaste(e), { signal });
   }
 
-  private handleInput(): void {
+  private handleInput(e: InputEvent): void {
+    // Android sends e.key="Unidentified" for +, so keydown can't filter it.
+    // Fall back to InputEvent.data (same approach as intl-tel-input).
+    if (this.opts.strict !== false && e.data === '+' && this.opts.separateDialCode) {
+      this.inputEl.value = this.inputEl.value.replace('+', '');
+    }
+
     const oldCursor = this.inputEl.selectionStart ?? 0;
     let raw = normalizeNumerals(this.inputEl.value);
 
