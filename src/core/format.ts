@@ -2,9 +2,9 @@ const TRAILING_SEP = /[\s\-]+$/;
 const FALLBACK_GROUP = /(.{4})(?=.)/g;
 const NON_ASCII_DIGITS = /[\u0660-\u0669\u06F0-\u06F9]/g;
 
-function isDigit(ch: string): boolean {
+function isRelevantChar(ch: string): boolean {
   const c = ch.charCodeAt(0);
-  return c >= 48 && c <= 57;
+  return (c >= 48 && c <= 57) || c === 43; // 0-9 or +
 }
 
 /**
@@ -49,19 +49,21 @@ export function getCursorPosition(
   oldCursor: number,
   newValue: string,
 ): number {
-  let digitsBeforeCursor = 0;
+  if (oldCursor === 0) return 0;
+
+  let relevantBeforeCursor = 0;
   for (let i = 0; i < oldCursor && i < oldValue.length; i++) {
-    if (isDigit(oldValue[i])) {
-      digitsBeforeCursor++;
+    if (isRelevantChar(oldValue[i])) {
+      relevantBeforeCursor++;
     }
   }
 
-  let digitCount = 0;
+  let count = 0;
   for (let i = 0; i < newValue.length; i++) {
-    if (isDigit(newValue[i])) {
-      digitCount++;
+    if (isRelevantChar(newValue[i])) {
+      count++;
     }
-    if (digitCount === digitsBeforeCursor) {
+    if (count === relevantBeforeCursor) {
       return i + 1;
     }
   }

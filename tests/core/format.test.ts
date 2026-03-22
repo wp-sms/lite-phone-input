@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatPhone, extractDigits, normalizeNumerals } from '../../src/core/format';
+import { formatPhone, getCursorPosition, extractDigits, normalizeNumerals } from '../../src/core/format';
 
 describe('formatPhone', () => {
   it('formats digits according to mask', () => {
@@ -20,6 +20,29 @@ describe('formatPhone', () => {
 
   it('uses fallback grouping when no pattern', () => {
     expect(formatPhone('1234567890', null)).toBe('1234 5678 90');
+  });
+});
+
+describe('getCursorPosition', () => {
+  it('returns 0 when oldCursor is 0', () => {
+    expect(getCursorPosition('+1 202', 0, '202')).toBe(0);
+  });
+
+  it('counts + as relevant character', () => {
+    expect(getCursorPosition('+', 1, '+')).toBe(1);
+  });
+
+  it('places cursor after matching relevant chars', () => {
+    expect(getCursorPosition('+1202', 3, '+1 202')).toBe(4);
+  });
+
+  it('handles transition from international to national format', () => {
+    // Backspace "+" from "+1 202" → "1 202", cursor should be at 0
+    expect(getCursorPosition('+1 202', 0, '1202')).toBe(0);
+  });
+
+  it('falls back to end when new value has fewer relevant chars', () => {
+    expect(getCursorPosition('+1 202 555', 10, '+1 202')).toBe(6);
   });
 });
 

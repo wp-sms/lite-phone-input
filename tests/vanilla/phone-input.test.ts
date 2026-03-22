@@ -504,4 +504,114 @@ describe('PhoneInput', () => {
       phone.destroy();
     });
   });
+
+  describe('inline mode display', () => {
+    it('shows national format when typing without +', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      input.value = '2025551234';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+      // Should NOT have +1 prefix
+      expect(input.value).not.toContain('+');
+      expect(input.value.replace(/\s/g, '')).toBe('2025551234');
+
+      phone.destroy();
+    });
+
+    it('shows raw input while typing partial dial code', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      input.value = '+4';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+      // Should show "+4" not "+1 4"
+      expect(input.value).toBe('+4');
+
+      phone.destroy();
+    });
+
+    it('switches country and formats when full dial code typed', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      input.value = '+442';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+      // Should detect UK and format with +44
+      expect(input.value.startsWith('+44')).toBe(true);
+      expect(phone.getCountry().code).toBe('GB');
+
+      phone.destroy();
+    });
+
+    it('formats full international number correctly', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      input.value = '+12025551234';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+      expect(input.value.startsWith('+1')).toBe(true);
+      expect(phone.getCountry().code).toBe('US');
+
+      phone.destroy();
+    });
+
+    it('shows + when user types just +', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      input.value = '+';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+      // Should keep "+" not clear it
+      expect(input.value).toBe('+');
+
+      phone.destroy();
+    });
+
+    it('shows national format when pasting without +', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      const paste = new Event('paste', { bubbles: true }) as any;
+      paste.clipboardData = { getData: () => '2025551234' };
+      paste.preventDefault = vi.fn();
+      input.dispatchEvent(paste);
+
+      expect(input.value).not.toContain('+');
+      expect(input.value.replace(/\s/g, '')).toBe('2025551234');
+
+      phone.destroy();
+    });
+
+    it('shows international format when pasting with +', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      const paste = new Event('paste', { bubbles: true }) as any;
+      paste.clipboardData = { getData: () => '+442071234567' };
+      paste.preventDefault = vi.fn();
+      input.dispatchEvent(paste);
+
+      expect(input.value.startsWith('+44')).toBe(true);
+      expect(phone.getCountry().code).toBe('GB');
+
+      phone.destroy();
+    });
+
+    it('shows international format after setValue()', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      phone.setValue('+442071234567');
+
+      expect(input.value.startsWith('+44')).toBe(true);
+
+      phone.destroy();
+    });
+  });
 });

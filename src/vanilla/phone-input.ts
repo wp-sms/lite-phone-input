@@ -12,6 +12,7 @@ export class PhoneInput {
   private countries: Country[];
   private selectedCountry: Country;
   private nationalDigits = '';
+  private displayInternational = false;
   private lastValidation: ValidationResult | null = null;
   private dropdown: Dropdown | null = null;
   private ac: AbortController;
@@ -286,18 +287,16 @@ export class PhoneInput {
 
       this.nationalDigits = digits;
 
-      // Format
-      const formatted = this.opts.formatAsYouType !== false
-        ? formatPhone(digits, this.selectedCountry.format)
-        : digits;
+      const formatted = this.formatNationalValue(digits);
 
       const newCursor = getCursorPosition(this.inputEl.value, oldCursor, formatted);
       this.inputEl.value = formatted;
       this.inputEl.setSelectionRange(newCursor, newCursor);
     } else {
-      // Inline mode: input contains +{dialCode}{national}
+      // Inline mode: input contains +{dialCode}{national} or just national
       const digits = extractDigits(raw);
       const hasPlus = raw.startsWith('+');
+      this.displayInternational = hasPlus;
 
       if (hasPlus && digits.length > 0) {
         // Try to detect country from dial code
@@ -315,8 +314,19 @@ export class PhoneInput {
 
       this.nationalDigits = national;
 
-      // Format full display value
-      const formatted = this.formatFullValue();
+      let formatted: string;
+      if (hasPlus) {
+        const dc = this.selectedCountry.dialCode;
+        if (digits.startsWith(dc) && national.length > 0) {
+          formatted = `+${dc} ${this.formatNationalValue(national)}`;
+        } else {
+          // Still typing dial code or partial match — show raw
+          formatted = `+${digits}`;
+        }
+      } else {
+        formatted = this.formatNationalValue(national);
+      }
+
       const newCursor = getCursorPosition(this.inputEl.value, oldCursor, formatted);
       this.inputEl.value = formatted;
       this.inputEl.setSelectionRange(newCursor, newCursor);
@@ -380,14 +390,15 @@ export class PhoneInput {
     }
 
     this.nationalDigits = digits;
+    this.displayInternational = isInternational;
 
     // Update display
     if (this.opts.separateDialCode) {
-      this.inputEl.value = this.opts.formatAsYouType !== false
-        ? formatPhone(this.nationalDigits, this.selectedCountry.format)
-        : this.nationalDigits;
+      this.inputEl.value = this.formatNationalValue();
     } else {
-      this.inputEl.value = this.formatFullValue();
+      this.inputEl.value = this.displayInternational
+        ? this.formatFullValue()
+        : this.formatNationalValue();
     }
 
     this.syncHiddenInputs();
@@ -509,12 +520,14 @@ export class PhoneInput {
 
   // --- Display ---
 
+  private formatNationalValue(digits = this.nationalDigits): string {
+    return this.opts.formatAsYouType !== false
+      ? formatPhone(digits, this.selectedCountry.format) : digits;
+  }
+
   private formatFullValue(): string {
     if (!this.nationalDigits) return '';
-    const formatted = this.opts.formatAsYouType !== false
-      ? formatPhone(this.nationalDigits, this.selectedCountry.format)
-      : this.nationalDigits;
-    return `+${this.selectedCountry.dialCode} ${formatted}`;
+    return `+${this.selectedCountry.dialCode} ${this.formatNationalValue()}`;
   }
 
   private updateFlag(): void {
@@ -583,11 +596,11 @@ export class PhoneInput {
     if (!this.inputEl) return;
 
     if (this.opts.separateDialCode) {
-      this.inputEl.value = this.opts.formatAsYouType !== false
-        ? formatPhone(this.nationalDigits, this.selectedCountry.format)
-        : this.nationalDigits;
+      this.inputEl.value = this.formatNationalValue();
     } else {
-      this.inputEl.value = this.formatFullValue();
+      this.inputEl.value = this.displayInternational
+        ? this.formatFullValue()
+        : this.formatNationalValue();
     }
   }
 
@@ -632,6 +645,7 @@ export class PhoneInput {
 
     digits = this.stripNationalPrefix(digits);
     this.nationalDigits = digits;
+    this.displayInternational = true;
 
     if (updateInput) this.reformatInput();
     this.syncHiddenInputs();
