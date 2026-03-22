@@ -187,6 +187,40 @@ describe('Dropdown', () => {
     });
   });
 
+  describe('portal positioning', () => {
+    it('uses fixed positioning when rendered in a portal container', () => {
+      const portalContainer = document.createElement('div');
+      document.body.appendChild(portalContainer);
+
+      const { dropdown } = createDropdown({ container: portalContainer });
+      dropdown.open(anchor);
+
+      const dropdownEl = portalContainer.querySelector('.lpi__dropdown') as HTMLElement;
+      expect(dropdownEl).toBeTruthy();
+      expect(dropdownEl.style.position).toBe('fixed');
+      expect(dropdownEl.style.top).toMatch(/^\d+(\.\d+)?px$/);
+      expect(dropdownEl.style.left).toMatch(/^\d+(\.\d+)?px$/);
+      dropdown.destroy();
+    });
+
+    it('does not use fixed positioning when container is the anchor parent', () => {
+      // Create a .lpi wrapper that is the anchor's parent
+      const lpiWrapper = document.createElement('div');
+      lpiWrapper.className = 'lpi';
+      document.body.appendChild(lpiWrapper);
+      const localAnchor = document.createElement('button');
+      lpiWrapper.appendChild(localAnchor);
+
+      const { dropdown } = createDropdown({ container: lpiWrapper });
+      dropdown.open(localAnchor);
+
+      const dropdownEl = lpiWrapper.querySelector('.lpi__dropdown') as HTMLElement;
+      expect(dropdownEl).toBeTruthy();
+      expect(dropdownEl.style.position).not.toBe('fixed');
+      dropdown.destroy();
+    });
+  });
+
   describe('preferred countries', () => {
     it('renders preferred countries first with separator', () => {
       const { dropdown, container } = createDropdown({

@@ -80,14 +80,17 @@ export class Dropdown {
     this.filteredItems = this.getOrderedCountries();
     this.buildList();
 
-    // Position and attach to container
+    // Attach to container
     this.options.container.appendChild(this.el);
-    this.position(anchorEl);
 
-    // Check mobile fullscreen
-    if (typeof window.matchMedia === 'function' &&
-        window.matchMedia('(max-width: 500px), (pointer: coarse) and (max-height: 600px)').matches) {
+    // Check mobile fullscreen — must happen before position() so inline styles don't override fullscreen CSS
+    const isFullscreen = typeof window.matchMedia === 'function' &&
+      window.matchMedia('(max-width: 500px), (pointer: coarse) and (max-height: 600px)').matches;
+
+    if (isFullscreen) {
       this.el.classList.add('lpi__dropdown--fullscreen');
+    } else {
+      this.position(anchorEl);
     }
 
     // Focus search
@@ -374,28 +377,31 @@ export class Dropdown {
     const spaceBelow = window.innerHeight - rect.bottom;
     const spaceAbove = rect.top;
 
-    // If rendering in a portal (document.body), use fixed-like absolute positioning
+    // Use calculated positioning when the dropdown is outside .lpi (portal mode).
+    // CSS-only positioning (top: 100%) only works when the dropdown is a child of .lpi
+    // which has position: relative.
     const container = this.options.container;
-    const isPortal = container === document.body;
+    const isPortal = container !== anchorEl.parentElement;
 
     if (isPortal) {
-      this.el.style.position = 'absolute';
-      const scrollTop = window.scrollY;
-      const scrollLeft = window.scrollX;
-      const dropdownHeight = Math.min(300, spaceAbove);
+      this.el.style.position = 'fixed';
+      // Neutralize CSS defaults that conflict with fixed positioning
+      this.el.style.bottom = 'auto';
+      this.el.style.margin = '0';
 
       if (spaceBelow >= 300 || spaceBelow >= spaceAbove) {
-        this.el.style.top = `${rect.bottom + scrollTop}px`;
-        this.el.style.left = `${rect.left + scrollLeft}px`;
+        this.el.style.top = `${rect.bottom}px`;
+        this.el.style.left = `${rect.left}px`;
         this.el.classList.remove('lpi__dropdown--above');
       } else {
-        this.el.style.top = `${rect.top + scrollTop - dropdownHeight}px`;
-        this.el.style.left = `${rect.left + scrollLeft}px`;
+        const dropdownHeight = Math.min(300, spaceAbove);
+        this.el.style.top = `${rect.top - dropdownHeight}px`;
+        this.el.style.left = `${rect.left}px`;
         this.el.classList.add('lpi__dropdown--above');
       }
       this.el.style.width = `${Math.max(rect.width, 280)}px`;
     } else {
-      // Relative to container
+      // Inside .lpi — CSS handles positioning via top: 100% + position: relative parent
       if (spaceBelow >= 300 || spaceBelow >= spaceAbove) {
         this.el.classList.remove('lpi__dropdown--above');
       } else {
