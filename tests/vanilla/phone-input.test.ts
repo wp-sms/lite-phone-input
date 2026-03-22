@@ -614,4 +614,90 @@ describe('PhoneInput', () => {
       phone.destroy();
     });
   });
+
+  describe('callback deduplication (infinite loop prevention)', () => {
+    it('setValue does not fire onChange when value normalizes to same result', () => {
+      const onChange = vi.fn();
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        onChange,
+      });
+
+      phone.setValue('+12025551234');
+      expect(onChange).toHaveBeenCalledTimes(1);
+
+      onChange.mockClear();
+      phone.setValue('+12025551234');
+      expect(onChange).not.toHaveBeenCalled();
+
+      phone.destroy();
+    });
+
+    it('setValue with national prefix fires onChange once with normalized value', () => {
+      const onChange = vi.fn();
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'DE',
+        onChange,
+      });
+
+      // "+4901234" has national prefix "0" which gets stripped → getValue()="+491234"
+      phone.setValue('+4901234');
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onChange.mock.calls[0][0]).toBe('+491234');
+
+      // Calling again with the same raw value should still produce the same
+      // normalized result → no second onChange
+      onChange.mockClear();
+      phone.setValue('+4901234');
+      expect(onChange).not.toHaveBeenCalled();
+
+      phone.destroy();
+    });
+
+    it('handleInput fires onChange once when country changes', () => {
+      const onChange = vi.fn();
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US', onChange });
+      onChange.mockClear();
+
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+      input.value = '+442071234567';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+      // Should fire exactly once (not double from detectCountryFromDigits + handleInput)
+      expect(onChange).toHaveBeenCalledTimes(1);
+
+      phone.destroy();
+    });
+
+    it('onCountryChange fires with correct data during handleInput', () => {
+      const onCountryChange = vi.fn();
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        onCountryChange,
+      });
+
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+      input.value = '+442071234567';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+      expect(onCountryChange).toHaveBeenCalledTimes(1);
+      expect(onCountryChange.mock.calls[0][0].code).toBe('GB');
+
+      phone.destroy();
+    });
+
+    it('setValue with empty string does not fire onChange when already empty', () => {
+      const onChange = vi.fn();
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        onChange,
+      });
+
+      // Already empty, setting empty should not fire
+      phone.setValue('');
+      expect(onChange).not.toHaveBeenCalled();
+
+      phone.destroy();
+    });
+  });
 });

@@ -223,4 +223,35 @@ describe('React PhoneInput', () => {
       );
     });
   });
+
+  describe('controlled mode loop prevention', () => {
+    it('does not loop with national-prefix values', () => {
+      const onChange = vi.fn();
+      const ref = createRef<PhoneInputRef>();
+
+      // Germany has nationalPrefix "0", so "+4901234567890" normalizes to "+491234567890"
+      function TestComponent() {
+        const [value, setValue] = useState('+4901234567890');
+        onChange.mockImplementation((e164: string) => {
+          setValue(e164);
+        });
+        return (
+          <PhoneInput
+            defaultCountry="DE"
+            value={value}
+            onChange={onChange}
+            ref={ref}
+          />
+        );
+      }
+
+      render(<TestComponent />);
+
+      // onChange should fire a limited number of times (once for normalization),
+      // not infinitely loop
+      expect(onChange.mock.calls.length).toBeLessThanOrEqual(2);
+      // Final value should be the normalized form
+      expect(ref.current!.getValue()).toBe('+491234567890');
+    });
+  });
 });

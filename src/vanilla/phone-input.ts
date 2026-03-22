@@ -300,7 +300,7 @@ export class PhoneInput {
 
       if (hasPlus && digits.length > 0) {
         // Try to detect country from dial code
-        this.detectCountryFromDigits(digits);
+        this.detectCountryFromDigits(digits, false);
       }
 
       // Extract national digits (remove dial code portion)
@@ -379,7 +379,7 @@ export class PhoneInput {
       if (cleaned.startsWith('00')) {
         digits = digits.slice(2);
       }
-      this.detectCountryFromDigits(digits);
+      this.detectCountryFromDigits(digits, false);
       digits = this.extractNationalFromFull(digits, true);
     }
 
@@ -476,13 +476,13 @@ export class PhoneInput {
       this.dropdown.setSelected(country.code);
     }
 
-    if (fireEvent && prev.code !== country.code) {
+    if (prev.code !== country.code) {
       this.opts.onCountryChange?.(country);
-      this.fireCallbacks();
+      if (fireEvent) this.fireCallbacks();
     }
   }
 
-  private detectCountryFromDigits(digits: string): void {
+  private detectCountryFromDigits(digits: string, fireEvent = true): void {
     // Try longest dial code first (up to 4 digits)
     for (let len = Math.min(4, digits.length); len >= 1; len--) {
       const prefix = digits.slice(0, len);
@@ -490,7 +490,7 @@ export class PhoneInput {
       if (match) {
         // If current country already matches this dial code, don't switch
         if (this.selectedCountry.dialCode === prefix) return;
-        this.selectCountry(match, true);
+        this.selectCountry(match, fireEvent);
         return;
       }
     }
@@ -627,11 +627,13 @@ export class PhoneInput {
   }
 
   private setValueInternal(e164: string, updateInput: boolean): void {
+    const prevValue = this.getValue();
+
     if (!e164) {
       this.nationalDigits = '';
       if (updateInput) this.reformatInput();
       this.syncHiddenInputs();
-      this.fireCallbacks();
+      if (this.getValue() !== prevValue) this.fireCallbacks();
       return;
     }
 
@@ -639,7 +641,7 @@ export class PhoneInput {
     const hasPlus = e164.startsWith('+');
 
     if (hasPlus) {
-      this.detectCountryFromDigits(digits);
+      this.detectCountryFromDigits(digits, false);
       digits = this.extractNationalFromFull(digits, true);
     }
 
@@ -649,7 +651,7 @@ export class PhoneInput {
 
     if (updateInput) this.reformatInput();
     this.syncHiddenInputs();
-    this.fireCallbacks();
+    if (this.getValue() !== prevValue) this.fireCallbacks();
   }
 
   private syncHiddenInputs(): void {
