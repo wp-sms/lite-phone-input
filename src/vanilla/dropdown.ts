@@ -349,7 +349,7 @@ export class Dropdown {
   }
 
   private handleClickOutside(e: MouseEvent): void {
-    if (this.el && !this.el.contains(e.target as Node)) {
+    if (this.el && !e.composedPath().includes(this.el)) {
       this.options.onClose();
     }
   }
