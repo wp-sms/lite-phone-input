@@ -56,7 +56,7 @@ export interface PhoneInputOptions {
   renderFlag?: (countryCode: string) => string;
   hiddenInput?: { phone?: string; country?: string };
   inputAttributes?: Record<string, string>;
-  value?: string;
+  initialValue?: string;
   containerClass?: string;
   dropdownContainer?: HTMLElement;
 

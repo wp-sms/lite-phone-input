@@ -109,26 +109,34 @@ describe('Preact PhoneInput', () => {
     });
   });
 
-  describe('controlled mode', () => {
-    it('syncs value prop to widget', () => {
-      renderInto(<PhoneInput defaultCountry="US" value="+12025551234" />);
+  describe('initial value', () => {
+    it('sets initial value on mount', () => {
+      renderInto(<PhoneInput defaultCountry="US" initialValue="+12025551234" />);
 
       const input = container.querySelector('.lpi__input') as HTMLInputElement;
       expect(input.value).toContain('202');
     });
 
-    it('updates when value prop changes', () => {
+    it('detects country from initialValue', () => {
       const ref = createRef<PhoneInputRef>();
-      renderInto(<PhoneInput defaultCountry="US" value="+12025551234" ref={ref} />);
-      expect(ref.current!.getValue()).toBe('+12025551234');
-
-      renderInto(<PhoneInput defaultCountry="US" value="+442071234567" ref={ref} />);
-      expect(ref.current!.getValue()).toContain('+44');
+      renderInto(<PhoneInput defaultCountry="US" initialValue="+442071234567" ref={ref} />);
+      expect(ref.current!.getCountry().code).toBe('GB');
+      expect(ref.current!.getValue()).toBe('+442071234567');
     });
 
-    it('fires onChange callback', () => {
+    it('updates value via ref.setValue', () => {
+      const ref = createRef<PhoneInputRef>();
+      renderInto(<PhoneInput defaultCountry="US" initialValue="+12025551234" ref={ref} />);
+      expect(ref.current!.getValue()).toBe('+12025551234');
+
+      act(() => ref.current!.setValue('+442071234567'));
+      expect(ref.current!.getValue()).toBe('+442071234567');
+      expect(ref.current!.getCountry().code).toBe('GB');
+    });
+
+    it('fires onChange callback on user input', () => {
       const onChange = vi.fn();
-      renderInto(<PhoneInput defaultCountry="US" value="" onChange={onChange} />);
+      renderInto(<PhoneInput defaultCountry="US" onChange={onChange} />);
 
       const input = container.querySelector('.lpi__input') as HTMLInputElement;
       act(() => {
@@ -139,6 +147,44 @@ describe('Preact PhoneInput', () => {
       expect(onChange).toHaveBeenCalled();
       const [e164, country] = onChange.mock.calls[0];
       expect(country.code).toBe('US');
+    });
+  });
+
+  describe('no value sync (freeze prevention)', () => {
+    it('does not have a value sync effect that could cause loops', () => {
+      const onChange = vi.fn();
+      const ref = createRef<PhoneInputRef>();
+
+      renderInto(
+        <PhoneInput
+          defaultCountry="DE"
+          initialValue="+4901234567890"
+          onChange={onChange}
+          ref={ref}
+        />,
+      );
+
+      // onChange fires at most once during mount for normalization
+      expect(onChange.mock.calls.length).toBeLessThanOrEqual(1);
+      expect(ref.current!.getValue()).toBe('+491234567890');
+    });
+
+    it('rapid typing does not cause value rollback', () => {
+      const onChange = vi.fn();
+      const ref = createRef<PhoneInputRef>();
+      renderInto(<PhoneInput defaultCountry="US" onChange={onChange} ref={ref} />);
+
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      for (const digit of ['2', '20', '202', '2025', '20255', '202555', '2025551', '20255512', '202555123', '2025551234']) {
+        act(() => {
+          input.value = digit;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+      }
+
+      expect(ref.current!.getNationalNumber()).toBe('2025551234');
+      expect(ref.current!.getValue()).toBe('+12025551234');
     });
   });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import React, { createRef, useState } from 'react';
+import React, { createRef } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { act } from 'react';
 import { PhoneInput } from '../../src/react/PhoneInput';
@@ -101,26 +101,34 @@ describe('React PhoneInput', () => {
     });
   });
 
-  describe('controlled mode', () => {
-    it('syncs value prop to widget', () => {
-      render(<PhoneInput defaultCountry="US" value="+12025551234" />);
+  describe('initial value', () => {
+    it('sets initial value on mount', () => {
+      render(<PhoneInput defaultCountry="US" initialValue="+12025551234" />);
 
       const input = container.querySelector('.lpi__input') as HTMLInputElement;
       expect(input.value).toContain('202');
     });
 
-    it('updates when value prop changes', () => {
+    it('detects country from initialValue', () => {
       const ref = createRef<PhoneInputRef>();
-      render(<PhoneInput defaultCountry="US" value="+12025551234" ref={ref} />);
-      expect(ref.current!.getValue()).toBe('+12025551234');
-
-      render(<PhoneInput defaultCountry="US" value="+442071234567" ref={ref} />);
-      expect(ref.current!.getValue()).toContain('+44');
+      render(<PhoneInput defaultCountry="US" initialValue="+442071234567" ref={ref} />);
+      expect(ref.current!.getCountry().code).toBe('GB');
+      expect(ref.current!.getValue()).toBe('+442071234567');
     });
 
-    it('fires onChange callback', () => {
+    it('updates value via ref.setValue', () => {
+      const ref = createRef<PhoneInputRef>();
+      render(<PhoneInput defaultCountry="US" initialValue="+12025551234" ref={ref} />);
+      expect(ref.current!.getValue()).toBe('+12025551234');
+
+      act(() => ref.current!.setValue('+442071234567'));
+      expect(ref.current!.getValue()).toBe('+442071234567');
+      expect(ref.current!.getCountry().code).toBe('GB');
+    });
+
+    it('fires onChange callback on user input', () => {
       const onChange = vi.fn();
-      render(<PhoneInput defaultCountry="US" value="" onChange={onChange} />);
+      render(<PhoneInput defaultCountry="US" onChange={onChange} />);
 
       const input = container.querySelector('.lpi__input') as HTMLInputElement;
       act(() => {
@@ -224,34 +232,44 @@ describe('React PhoneInput', () => {
     });
   });
 
-  describe('controlled mode loop prevention', () => {
-    it('does not loop with national-prefix values', () => {
+  describe('no value sync (freeze prevention)', () => {
+    it('does not have a value sync effect that could cause loops', () => {
       const onChange = vi.fn();
       const ref = createRef<PhoneInputRef>();
 
-      // Germany has nationalPrefix "0", so "+4901234567890" normalizes to "+491234567890"
-      function TestComponent() {
-        const [value, setValue] = useState('+4901234567890');
-        onChange.mockImplementation((e164: string) => {
-          setValue(e164);
+      render(
+        <PhoneInput
+          defaultCountry="DE"
+          initialValue="+4901234567890"
+          onChange={onChange}
+          ref={ref}
+        />,
+      );
+
+      // onChange fires once during mount for normalization (national prefix stripped)
+      expect(onChange.mock.calls.length).toBeLessThanOrEqual(1);
+      // Value should be the normalized form
+      expect(ref.current!.getValue()).toBe('+491234567890');
+    });
+
+    it('rapid typing does not cause value rollback', () => {
+      const onChange = vi.fn();
+      const ref = createRef<PhoneInputRef>();
+      render(<PhoneInput defaultCountry="US" onChange={onChange} ref={ref} />);
+
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      // Simulate rapid typing
+      for (const digit of ['2', '20', '202', '2025', '20255', '202555', '2025551', '20255512', '202555123', '2025551234']) {
+        act(() => {
+          input.value = digit;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
         });
-        return (
-          <PhoneInput
-            defaultCountry="DE"
-            value={value}
-            onChange={onChange}
-            ref={ref}
-          />
-        );
       }
 
-      render(<TestComponent />);
-
-      // onChange should fire a limited number of times (once for normalization),
-      // not infinitely loop
-      expect(onChange.mock.calls.length).toBeLessThanOrEqual(2);
-      // Final value should be the normalized form
-      expect(ref.current!.getValue()).toBe('+491234567890');
+      // Final value should reflect the last typed input, not roll back
+      expect(ref.current!.getNationalNumber()).toBe('2025551234');
+      expect(ref.current!.getValue()).toBe('+12025551234');
     });
   });
 });

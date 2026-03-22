@@ -21,7 +21,7 @@ const WIDGET_KEYS = new Set<string>([
   'defaultCountry', 'allowedCountries', 'excludedCountries', 'preferredCountries',
   'allowDropdown', 'formatAsYouType', 'strict', 'separateDialCode',
   'placeholder', 'disabled', 'locale', 'renderFlag', 'hiddenInput',
-  'value', 'containerClass', 'dropdownContainer',
+  'initialValue', 'containerClass', 'dropdownContainer',
   'onChange', 'onCountryChange', 'onValidationChange', 'onDropdownOpen', 'onDropdownClose',
 ]);
 
@@ -75,7 +75,7 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
         hiddenInput: p.hiddenInput,
         containerClass: p.containerClass,
         dropdownContainer: p.dropdownContainer,
-        value: p.value,
+        initialValue: p.initialValue,
         inputAttributes,
         onChange: (e164, country, validation) =>
           propsRef.current.onChange?.(e164, country, validation),
@@ -121,11 +121,6 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
 
       if (hasChanges) {
         instance.setOptions(opts);
-      }
-
-      // Controlled mode: sync value only when it differs from what the widget already has
-      if (props.value !== undefined && props.value !== instance.getValue()) {
-        instance.setValue(props.value);
       }
     });
 

@@ -433,7 +433,7 @@ describe('PhoneInput', () => {
     it('sets initial value and detects country', () => {
       const phone = PhoneInput.mount(container, {
         defaultCountry: 'US',
-        value: '+442071234567',
+        initialValue: '+442071234567',
       });
 
       expect(phone.getCountry().code).toBe('GB');
