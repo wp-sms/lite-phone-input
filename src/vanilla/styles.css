@@ -1,29 +1,14 @@
-/* Container — CSS custom property defaults live here (not :root) for shadow DOM compat */
+/* Container */
 .lpi {
-  --lpi-bg: #fff;
-  --lpi-border-color: #ccc;
-  --lpi-border-radius: 4px;
-  --lpi-text-color: #333;
-  --lpi-hover-bg: #f5f5f5;
-  --lpi-selected-bg: #e8f0fe;
-  --lpi-highlight-bg: #f0f0f0;
-  --lpi-dropdown-bg: #fff;
-  --lpi-dropdown-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  --lpi-font-size: 14px;
-  --lpi-flag-size: 1.2em;
-  --lpi-spacing: 8px;
-  --lpi-input-height: 40px;
-  --lpi-dropdown-max-height: 300px;
-
   display: flex;
   position: relative;
   font-family: inherit;
-  font-size: var(--lpi-font-size);
-  color: var(--lpi-text-color);
-  background: var(--lpi-bg);
-  border: 1px solid var(--lpi-border-color);
-  border-radius: var(--lpi-border-radius);
-  height: var(--lpi-input-height);
+  font-size: var(--lpi-font-size, 14px);
+  color: var(--lpi-text-color, #333);
+  background: var(--lpi-bg, #fff);
+  border: 1px solid var(--lpi-border-color, #ccc);
+  border-radius: var(--lpi-border-radius, 4px);
+  height: var(--lpi-input-height, 40px);
   box-sizing: border-box;
 }
 
@@ -37,7 +22,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 0 var(--lpi-spacing);
+  padding: 0 var(--lpi-spacing, 8px);
   border: none;
   background: none;
   cursor: pointer;
@@ -45,17 +30,17 @@
   color: inherit;
   line-height: 1;
   flex-shrink: 0;
-  border-right: 1px solid var(--lpi-border-color);
+  border-right: 1px solid var(--lpi-border-color, #ccc);
 }
 
 .lpi__trigger:hover {
-  background: var(--lpi-hover-bg);
+  background: var(--lpi-hover-bg, #f5f5f5);
 }
 
 .lpi__trigger:focus-visible {
-  outline: 2px solid #4d90fe;
+  outline: 2px solid var(--lpi-focus-color, #4d90fe);
   outline-offset: -2px;
-  border-radius: var(--lpi-border-radius) 0 0 var(--lpi-border-radius);
+  border-radius: var(--lpi-border-radius, 4px) 0 0 var(--lpi-border-radius, 4px);
 }
 
 span.lpi__trigger {
@@ -67,7 +52,7 @@ span.lpi__trigger:hover {
 }
 
 .lpi__flag {
-  font-size: var(--lpi-flag-size);
+  font-size: var(--lpi-flag-size, 1.2em);
   line-height: 1;
 }
 
@@ -87,7 +72,7 @@ span.lpi__trigger:hover {
   flex: 1;
   min-width: 0;
   height: 100%;
-  padding: 0 var(--lpi-spacing);
+  padding: 0 var(--lpi-spacing, 8px);
   border: none;
   background: none;
   font-family: inherit;
@@ -98,11 +83,11 @@ span.lpi__trigger:hover {
 }
 
 .lpi:focus-within {
-  border-color: #4d90fe;
-  box-shadow: 0 0 0 1px #4d90fe;
+  border-color: var(--lpi-focus-color, #4d90fe);
+  box-shadow: 0 0 0 1px var(--lpi-focus-color, #4d90fe);
 }
 
-/* Dropdown — inline fallbacks so it works even when rendered outside .lpi (e.g. custom dropdownContainer) */
+/* Dropdown */
 .lpi__dropdown {
   position: absolute;
   top: 100%;
