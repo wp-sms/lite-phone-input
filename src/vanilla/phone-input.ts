@@ -43,7 +43,7 @@ export class PhoneInput {
 
       // Process initial value
       if (this.opts.value) {
-        this.setValueInternal(this.opts.value, false);
+        this.setValueInternal(this.opts.value, true);
       }
     }
   }

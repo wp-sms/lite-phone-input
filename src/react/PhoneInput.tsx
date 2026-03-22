@@ -48,7 +48,6 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
     const containerRef = useRef<HTMLDivElement>(null);
     const instanceRef = useRef<VanillaPhoneInput | null>(null);
     const propsRef = useRef(props);
-    const prevValueRef = useRef<string | undefined>(undefined);
     const prevOptsRef = useRef<Record<string, unknown>>({});
     propsRef.current = props;
 
@@ -127,11 +126,10 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
         instance.setOptions(opts);
       }
 
-      // Controlled mode: sync value only when it changed
-      if (props.value !== undefined && props.value !== prevValueRef.current) {
+      // Controlled mode: sync value only when it differs from what the widget already has
+      if (props.value !== undefined && props.value !== instance.getValue()) {
         instance.setValue(props.value);
       }
-      prevValueRef.current = props.value;
     });
 
     useImperativeHandle(ref, () => ({
