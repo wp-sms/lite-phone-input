@@ -164,7 +164,7 @@ PhoneInput.mount(el, {
 | intl-tel-input React | lite-phone-input React | Notes |
 |---|---|---|
 | `initOptions={{ ... }}` | Props directly on component | lite flattens options as props |
-| `initialValue="..."` | `value="..."` | Supports controlled mode |
+| `initialValue="..."` | `initialValue="..."` | Always uncontrolled; use `initialValue` to pre-fill |
 | `inputProps={{ name, id }}` | `name="..." id="..."` (direct props) | Forwards unknown props to input |
 | `onChangeNumber` | `onChange` | lite passes `(e164, country, validation)` |
 | `onChangeCountry` | `onCountryChange` | lite passes full country object |
@@ -197,7 +197,7 @@ PhoneInput.mount(el, {
   defaultCountry="US"
   separateDialCode
   allowedCountries={['US', 'GB']}
-  value="+12025551234"
+  initialValue="+12025551234"
   name="phone"
   onChange={(e164) => setPhone(e164)}
   onCountryChange={(country) => setCountry(country.code)}

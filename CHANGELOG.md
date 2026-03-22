@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-03-22
+
+### Breaking
+
+- **`value` prop replaced with `initialValue` (React/Preact)** — Controlled mode removed. The component is now always uncontrolled. Use `initialValue` to pre-fill, `onChange` to observe, and `ref` methods to read/write programmatically.
+
+### Changed
+
+- **CSS custom properties no longer declared in `.lpi`** — Consumers can override variables at `:root` or any ancestor scope without specificity battles.
+- **Dropdown positioning uses `position: fixed`** instead of `position: absolute` + scroll offsets when rendered in a portal container.
+
+### Fixed
+
+- **Dropdown positioning works with any custom `dropdownContainer`**, not just `document.body`. Previously, custom containers fell back to CSS-only positioning which broke outside `.lpi`.
+- **Inline mode** input handling and cursor positioning.
+
 ## [0.1.0] - 2025-01-01
 
 ### Added
@@ -36,4 +52,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TypeScript-first** — written in TypeScript with full type definitions
 - **Zero runtime dependencies**
 
+[0.2.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/wp-sms/lite-phone-input/releases/tag/v0.1.0

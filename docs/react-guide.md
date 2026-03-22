@@ -15,24 +15,29 @@ import 'lite-phone-input/styles';
 
 Requires React 17+.
 
-## Controlled Mode
+## Basic Usage
 
-Pass a `value` prop to make the component controlled:
+The component is always uncontrolled. Use `initialValue` to pre-fill, `onChange` to observe changes, and `ref` methods to read/write programmatically:
 
 ```jsx
-import { useState } from 'react';
+import { useRef } from 'react';
 import { PhoneInput } from 'lite-phone-input/react';
 import 'lite-phone-input/styles';
 
 function PhoneForm() {
-  const [value, setValue] = useState('');
+  const phoneRef = useRef(null);
 
   return (
     <PhoneInput
+      ref={phoneRef}
       defaultCountry="US"
       separateDialCode
-      value={value}
-      onChange={(e164) => setValue(e164)}
+      initialValue="+12025551234"
+      onChange={(e164, country, validation) => {
+        console.log(e164);            // '+12025551234'
+        console.log(country.code);    // 'US'
+        console.log(validation.valid); // true
+      }}
     />
   );
 }
@@ -40,9 +45,9 @@ function PhoneForm() {
 
 The `onChange` callback receives `(e164, country, validation)` on every value change.
 
-## Uncontrolled Mode
+## Ref-Based Access
 
-Omit the `value` prop and use a ref to read values imperatively:
+Use a ref to read values imperatively:
 
 ```jsx
 import { useRef } from 'react';
@@ -144,7 +149,7 @@ function PhoneForm() {
           <PhoneInput
             defaultCountry="US"
             separateDialCode
-            value={field.value}
+            initialValue={field.value}
             onChange={(e164) => field.onChange(e164)}
             name={field.name}
           />
@@ -175,7 +180,7 @@ function PhoneForm() {
         <Form>
           <PhoneInput
             defaultCountry="US"
-            value={values.phone}
+            initialValue={values.phone}
             onChange={(e164) => setFieldValue('phone', e164)}
             name="phone"
           />
@@ -215,14 +220,13 @@ const PhoneInput = dynamic(
 ## Complete Form Example
 
 ```tsx
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { PhoneInput, type PhoneInputRef } from 'lite-phone-input/react';
 import type { ValidationResult } from 'lite-phone-input';
 import 'lite-phone-input/styles';
 
 function ContactForm() {
   const phoneRef = useRef<PhoneInputRef>(null);
-  const [value, setValue] = useState('');
   const [error, setError] = useState('');
 
   const handleValidation = (v: ValidationResult) => {
@@ -252,8 +256,7 @@ function ContactForm() {
         defaultCountry="US"
         separateDialCode
         preferredCountries={['US', 'GB', 'CA']}
-        value={value}
-        onChange={(e164) => setValue(e164)}
+        onChange={(e164) => console.log(e164)}
         onValidationChange={handleValidation}
         id="phone"
         name="phone"

@@ -68,7 +68,7 @@ Pass these to `PhoneInput.mount(el, options)` (vanilla) or as props (React/Preac
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `value` | `string` | `''` | E.164 value to pre-fill. Auto-detects country from dial code |
+| `initialValue` | `string` | `''` | E.164 value to pre-fill. Auto-detects country from dial code |
 
 ### Callbacks
 
@@ -133,8 +133,8 @@ All options listed above work as props:
   separateDialCode
   formatAsYouType
   strict
-  value={value}
-  onChange={(e164, country, validation) => setValue(e164)}
+  initialValue="+12025551234"
+  onChange={(e164, country, validation) => console.log(e164)}
 />
 ```
 
@@ -153,12 +153,9 @@ Props not recognized as widget props are spread onto the `<input>` element:
 />
 ```
 
-### Controlled vs Uncontrolled
+### Uncontrolled Only
 
-| Mode | How | Description |
-|---|---|---|
-| **Controlled** | Pass `value` prop | Component syncs to your state on every render |
-| **Uncontrolled** | Omit `value` prop | Read via ref methods |
+The React and Preact components are always uncontrolled. Use `initialValue` to pre-fill the input and `ref` methods (`getValue()`, `setValue()`) to read/write programmatically. Use `onChange` to observe value changes.
 
 ---
 
@@ -312,7 +309,7 @@ interface PhoneInputOptions {
   renderFlag?: (countryCode: string) => string;
   hiddenInput?: { phone?: string; country?: string };
   inputAttributes?: Record<string, string>;
-  value?: string;
+  initialValue?: string;
   containerClass?: string;
   dropdownContainer?: HTMLElement;
 
@@ -367,6 +364,6 @@ Each subpath provides ESM (`.js`), CJS (`.cjs`), and TypeScript definitions (`.d
 
 - [Getting Started](getting-started.md) — installation and first render
 - [Vanilla JS Guide](vanilla-guide.md) — mount/destroy lifecycle, complete examples
-- [React Guide](react-guide.md) — controlled/uncontrolled, form libraries
+- [React Guide](react-guide.md) — usage, ref methods, form libraries
 - [Styling & Theming](styling.md) — CSS variables and BEM classes
 - [Validation](validation.md) — validation model and error messages

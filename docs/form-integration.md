@@ -81,7 +81,7 @@ function PhoneForm() {
           <PhoneInput
             defaultCountry="US"
             separateDialCode
-            value={field.value}
+            initialValue={field.value}
             onChange={(e164) => field.onChange(e164)}
             name={field.name}
           />
@@ -118,7 +118,7 @@ function PhoneForm() {
         <Form>
           <PhoneInput
             defaultCountry="US"
-            value={values.phone}
+            initialValue={values.phone}
             onChange={(e164) => setFieldValue('phone', e164)}
             name="phone"
           />

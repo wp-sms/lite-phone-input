@@ -39,15 +39,14 @@ import { PhoneInput } from 'lite-phone-input/react';
 
 The API is otherwise identical — same props, same ref methods, same callbacks.
 
-## Controlled Example
+## Basic Example
 
 ```jsx
-import { useState, useRef } from 'preact/hooks';
+import { useRef } from 'preact/hooks';
 import { PhoneInput } from 'lite-phone-input/preact';
 import 'lite-phone-input/styles';
 
 function PhoneForm() {
-  const [value, setValue] = useState('');
   const phoneRef = useRef(null);
 
   const handleSubmit = (e) => {
@@ -63,8 +62,8 @@ function PhoneForm() {
         ref={phoneRef}
         defaultCountry="US"
         separateDialCode
-        value={value}
-        onChange={(e164) => setValue(e164)}
+        initialValue="+12025551234"
+        onChange={(e164) => console.log(e164)}
         name="phone"
       />
       <button type="submit">Submit</button>
@@ -125,7 +124,7 @@ import { PhoneInput } from 'lite-phone-input/preact';
 import 'lite-phone-input/styles';
 
 function App() {
-  const [value, setValue] = useState('');
+  const [display, setDisplay] = useState('');
   const [valid, setValid] = useState(false);
   const phoneRef = useRef(null);
 
@@ -136,16 +135,16 @@ function App() {
         defaultCountry="US"
         separateDialCode
         preferredCountries={['US', 'GB', 'CA']}
-        value={value}
+        initialValue=""
         onChange={(e164, country, validation) => {
-          setValue(e164);
+          setDisplay(e164);
           setValid(validation.valid);
         }}
         name="phone"
         aria-label="Phone number"
       />
       <p>
-        Value: {value || '(empty)'} — {valid ? 'Valid' : 'Invalid'}
+        Value: {display || '(empty)'} — {valid ? 'Valid' : 'Invalid'}
       </p>
     </div>
   );

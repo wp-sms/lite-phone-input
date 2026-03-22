@@ -55,12 +55,11 @@ const phone = PhoneInput.mount(document.getElementById('phone'), {
 ### React
 
 ```jsx
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { PhoneInput } from 'lite-phone-input/react';
 import 'lite-phone-input/styles';
 
 function MyForm() {
-  const [value, setValue] = useState('');
   const phoneRef = useRef(null);
 
   return (
@@ -68,8 +67,8 @@ function MyForm() {
       ref={phoneRef}
       defaultCountry="US"
       separateDialCode
-      value={value}
-      onChange={(e164) => setValue(e164)}
+      initialValue="+12025551234"
+      onChange={(e164) => console.log(e164)}
       name="phone"
       aria-label="Phone number"
     />
@@ -104,7 +103,7 @@ Same API as React. Uses `preact/hooks` directly — no `preact/compat` required.
 |---|---|
 | [Getting Started](docs/getting-started.md) | Installation and first render |
 | [Vanilla JS Guide](docs/vanilla-guide.md) | Mounting, methods, callbacks |
-| [React Guide](docs/react-guide.md) | Controlled/uncontrolled, form libraries |
+| [React Guide](docs/react-guide.md) | Usage, ref methods, form libraries |
 | [Preact Guide](docs/preact-guide.md) | Preact-specific setup |
 | [API Reference](docs/api-reference.md) | All options, methods, and types |
 | [Styling & Theming](docs/styling.md) | CSS variables, BEM classes, dark mode |

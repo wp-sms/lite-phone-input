@@ -71,7 +71,7 @@ PhoneInput.mount(el, {
 });
 ```
 
-When using `document.body` (default), the dropdown uses absolute positioning with scroll offsets to stay aligned with the trigger.
+When using a portal container (including the default `document.body`), the dropdown uses `position: fixed` to stay aligned with the trigger regardless of scroll position.
 
 ## Dynamic Options
 
