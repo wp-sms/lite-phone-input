@@ -13,6 +13,10 @@ export class PhoneInput {
   private selectedCountry: Country;
   private nationalDigits = '';
   private displayInternational = false;
+
+  private get isNationalInput(): boolean {
+    return !!this.opts.separateDialCode || !!this.opts.nationalMode;
+  }
   private lastValidation: ValidationResult | null = null;
   private dropdown: Dropdown | null = null;
   private ac: AbortController;
@@ -113,7 +117,10 @@ export class PhoneInput {
       }
     }
 
-    if (opts.separateDialCode !== undefined && opts.separateDialCode !== prev.separateDialCode) {
+    const displayModeChanged =
+      (opts.separateDialCode !== undefined && opts.separateDialCode !== prev.separateDialCode) ||
+      (opts.nationalMode !== undefined && opts.nationalMode !== prev.nationalMode);
+    if (displayModeChanged) {
       this.updateDisplayMode();
     }
 
@@ -153,6 +160,9 @@ export class PhoneInput {
     }
     if (this.opts.separateDialCode) {
       this.containerEl.classList.add('lpi--separate-dial-code');
+    }
+    if (this.opts.nationalMode && !this.opts.separateDialCode) {
+      this.containerEl.classList.add('lpi--national-mode');
     }
     if (this.opts.disabled) {
       this.containerEl.classList.add('lpi--disabled');
@@ -266,14 +276,14 @@ export class PhoneInput {
   private handleInput(e: InputEvent): void {
     // Android sends e.key="Unidentified" for +, so keydown can't filter it.
     // Fall back to InputEvent.data (same approach as intl-tel-input).
-    if (this.opts.strict !== false && e.data === '+' && this.opts.separateDialCode) {
+    if (this.opts.strict !== false && e.data === '+' && this.isNationalInput) {
       this.inputEl.value = this.inputEl.value.replace('+', '');
     }
 
     const oldCursor = this.inputEl.selectionStart ?? 0;
     let raw = normalizeNumerals(this.inputEl.value);
 
-    if (this.opts.separateDialCode) {
+    if (this.isNationalInput) {
       // Input contains only national number
       let digits = extractDigits(raw);
 
@@ -351,7 +361,7 @@ export class PhoneInput {
     }
 
     // Allow + at position 0 in inline mode
-    if (!this.opts.separateDialCode && e.key === '+' && this.inputEl.selectionStart === 0) {
+    if (!this.isNationalInput && e.key === '+' && this.inputEl.selectionStart === 0) {
       return;
     }
 
@@ -390,10 +400,10 @@ export class PhoneInput {
     }
 
     this.nationalDigits = digits;
-    this.displayInternational = isInternational;
+    this.displayInternational = isInternational && !this.isNationalInput;
 
     // Update display
-    if (this.opts.separateDialCode) {
+    if (this.isNationalInput) {
       this.inputEl.value = this.formatNationalValue();
     } else {
       this.inputEl.value = this.displayInternational
@@ -554,7 +564,7 @@ export class PhoneInput {
       const mask = this.selectedCountry.format;
       if (mask) {
         const example = mask.replace(/X/g, '0');
-        if (this.opts.separateDialCode) {
+        if (this.isNationalInput) {
           this.inputEl.placeholder = example;
         } else {
           this.inputEl.placeholder = `+${this.selectedCountry.dialCode} ${example}`;
@@ -571,6 +581,7 @@ export class PhoneInput {
 
   private updateDisplayMode(): void {
     this.containerEl.classList.toggle('lpi--separate-dial-code', !!this.opts.separateDialCode);
+    this.containerEl.classList.toggle('lpi--national-mode', !!this.opts.nationalMode && !this.opts.separateDialCode);
 
     // Rebuild dial code element in trigger
     if (this.opts.separateDialCode && !this.dialCodeEl) {
@@ -595,7 +606,7 @@ export class PhoneInput {
   private reformatInput(): void {
     if (!this.inputEl) return;
 
-    if (this.opts.separateDialCode) {
+    if (this.isNationalInput) {
       this.inputEl.value = this.formatNationalValue();
     } else {
       this.inputEl.value = this.displayInternational
@@ -647,7 +658,7 @@ export class PhoneInput {
 
     digits = this.stripNationalPrefix(digits);
     this.nationalDigits = digits;
-    this.displayInternational = true;
+    this.displayInternational = !this.isNationalInput;
 
     if (updateInput) this.reformatInput();
     this.syncHiddenInputs();

@@ -19,7 +19,7 @@ type WidgetProps = Omit<PhoneInputOptions, 'inputAttributes'>;
 /** Keys that belong to the widget, not to the underlying <input> element */
 const WIDGET_KEYS = new Set<string>([
   'defaultCountry', 'allowedCountries', 'excludedCountries', 'preferredCountries',
-  'allowDropdown', 'formatAsYouType', 'strict', 'separateDialCode',
+  'allowDropdown', 'formatAsYouType', 'strict', 'separateDialCode', 'nationalMode',
   'placeholder', 'disabled', 'locale', 'renderFlag', 'hiddenInput',
   'initialValue', 'containerClass', 'dropdownContainer',
   'onChange', 'onCountryChange', 'onValidationChange', 'onDropdownOpen', 'onDropdownClose',
@@ -31,7 +31,7 @@ export type PhoneInputProps = WidgetProps & InputAttrs;
 
 const DYNAMIC_OPTION_KEYS: (keyof WidgetProps)[] = [
   'disabled', 'allowedCountries', 'excludedCountries', 'preferredCountries',
-  'allowDropdown', 'formatAsYouType', 'strict', 'separateDialCode',
+  'allowDropdown', 'formatAsYouType', 'strict', 'separateDialCode', 'nationalMode',
   'placeholder', 'locale', 'renderFlag',
 ];
 
@@ -68,6 +68,7 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
         formatAsYouType: p.formatAsYouType,
         strict: p.strict,
         separateDialCode: p.separateDialCode,
+        nationalMode: p.nationalMode,
         placeholder: p.placeholder,
         disabled: p.disabled,
         locale: p.locale,

@@ -42,6 +42,7 @@ Pass these to `PhoneInput.mount(el, options)` (vanilla) or as props (React/Preac
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `separateDialCode` | `boolean` | `false` | Show the dial code outside the input (e.g. `+1` in the trigger area) |
+| `nationalMode` | `boolean` | `false` | Display only the national number (no dial code anywhere). Output is still E.164. If `separateDialCode` is also true, it takes precedence |
 | `placeholder` | `string \| 'auto'` | `'auto'` | `'auto'` generates from format mask. Any other string sets a custom placeholder |
 | `disabled` | `boolean` | `false` | Disable the input and country trigger |
 
@@ -303,6 +304,7 @@ interface PhoneInputOptions {
   formatAsYouType?: boolean;
   strict?: boolean;
   separateDialCode?: boolean;
+  nationalMode?: boolean;
   placeholder?: string | 'auto';
   disabled?: boolean;
   locale?: string;

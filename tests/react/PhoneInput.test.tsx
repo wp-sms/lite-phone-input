@@ -232,6 +232,28 @@ describe('React PhoneInput', () => {
     });
   });
 
+  describe('nationalMode', () => {
+    it('passes nationalMode prop to vanilla widget', () => {
+      const ref = createRef<PhoneInputRef>();
+      render(<PhoneInput defaultCountry="US" nationalMode ref={ref} />);
+
+      expect(container.querySelector('.lpi--national-mode')).toBeTruthy();
+
+      act(() => ref.current!.setValue('+12025551234'));
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+      expect(input.value).not.toContain('+');
+      expect(ref.current!.getValue()).toBe('+12025551234');
+    });
+
+    it('syncs nationalMode prop changes via setOptions', () => {
+      render(<PhoneInput defaultCountry="US" nationalMode={false} />);
+      expect(container.querySelector('.lpi--national-mode')).toBeNull();
+
+      render(<PhoneInput defaultCountry="US" nationalMode={true} />);
+      expect(container.querySelector('.lpi--national-mode')).toBeTruthy();
+    });
+  });
+
   describe('no value sync (freeze prevention)', () => {
     it('does not have a value sync effect that could cause loops', () => {
       const onChange = vi.fn();

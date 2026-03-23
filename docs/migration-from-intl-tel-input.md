@@ -84,7 +84,7 @@ lite-phone-input gives you formatting and validation in ~13KB with zero dependen
 | `separateDialCode` | `separateDialCode` | Same |
 | `formatAsYouType` | `formatAsYouType` | Same |
 | `strictMode` | `strict` | Same behavior, shorter name |
-| `nationalMode` | — | Use `separateDialCode` to control display |
+| `nationalMode` | `nationalMode` | Same behavior |
 | `containerClass` | `containerClass` | Same |
 | `dropdownContainer` | `dropdownContainer` | Same |
 | `countrySearch` | — | Always enabled |

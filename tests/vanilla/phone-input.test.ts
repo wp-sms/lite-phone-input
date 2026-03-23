@@ -443,6 +443,303 @@ describe('PhoneInput', () => {
     });
   });
 
+  describe('nationalMode', () => {
+    describe('display', () => {
+      it('container has lpi--national-mode class', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+
+        expect(container.querySelector('.lpi--national-mode')).toBeTruthy();
+
+        phone.destroy();
+      });
+
+      it('does NOT show dial code in trigger', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+
+        expect(container.querySelector('.lpi__dial-code')).toBeNull();
+
+        phone.destroy();
+      });
+
+      it('shows national format in input after setValue with E.164', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        phone.setValue('+12025551234');
+
+        expect(input.value).not.toContain('+');
+        expect(input.value.replace(/\s/g, '')).toBe('2025551234');
+
+        phone.destroy();
+      });
+    });
+
+    describe('placeholder', () => {
+      it('generates national-only placeholder (no dial code prefix)', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        // US format is "XXX XXX XXXX", auto placeholder should be "000 000 0000"
+        expect(input.placeholder).toBe('000 000 0000');
+        expect(input.placeholder).not.toContain('+');
+
+        phone.destroy();
+      });
+    });
+
+    describe('input behavior', () => {
+      it('treats all input as national digits', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        input.value = '2025551234';
+        input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+        expect(input.value).not.toContain('+');
+        expect(phone.getNationalNumber()).toBe('2025551234');
+
+        phone.destroy();
+      });
+
+      it('blocks + at position 0 in strict mode', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        input.value = '+';
+        input.dispatchEvent(new InputEvent('input', { data: '+', bubbles: true }));
+
+        expect(input.value).not.toContain('+');
+
+        phone.destroy();
+      });
+    });
+
+    describe('pasting', () => {
+      it('auto-detects country from pasted international number', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        const paste = new Event('paste', { bubbles: true }) as any;
+        paste.clipboardData = { getData: () => '+442071234567' };
+        paste.preventDefault = vi.fn();
+        input.dispatchEvent(paste);
+
+        expect(phone.getCountry().code).toBe('GB');
+
+        phone.destroy();
+      });
+
+      it('displays national format after pasting international number', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        const paste = new Event('paste', { bubbles: true }) as any;
+        paste.clipboardData = { getData: () => '+442071234567' };
+        paste.preventDefault = vi.fn();
+        input.dispatchEvent(paste);
+
+        expect(input.value).not.toContain('+');
+        expect(input.value.replace(/\s/g, '')).toBe('2071234567');
+
+        phone.destroy();
+      });
+
+      it('handles pasting with 00 prefix', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        const paste = new Event('paste', { bubbles: true }) as any;
+        paste.clipboardData = { getData: () => '00442071234567' };
+        paste.preventDefault = vi.fn();
+        input.dispatchEvent(paste);
+
+        expect(phone.getCountry().code).toBe('GB');
+        expect(input.value).not.toContain('+');
+
+        phone.destroy();
+      });
+    });
+
+    describe('country changes', () => {
+      it('reformats to national format on country change', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        phone.setValue('+12025551234');
+        phone.setCountry('GB');
+
+        expect(input.value).not.toContain('+');
+
+        phone.destroy();
+      });
+    });
+
+    describe('output', () => {
+      it('getValue() returns E.164', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+
+        phone.setValue('+12025551234');
+        expect(phone.getValue()).toBe('+12025551234');
+
+        phone.destroy();
+      });
+
+      it('getNationalNumber() returns correct national digits', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+
+        phone.setValue('+12025551234');
+        expect(phone.getNationalNumber()).toBe('2025551234');
+
+        phone.destroy();
+      });
+
+      it('hidden inputs contain E.164', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+          hiddenInput: { phone: 'phone_e164', country: 'phone_country' },
+        });
+
+        phone.setValue('+442071234567');
+
+        const phoneHidden = container.querySelector('input[name="phone_e164"]') as HTMLInputElement;
+        const countryHidden = container.querySelector('input[name="phone_country"]') as HTMLInputElement;
+
+        expect(phoneHidden.value).toBe('+442071234567');
+        expect(countryHidden.value).toBe('GB');
+
+        phone.destroy();
+      });
+
+      it('onChange receives E.164', () => {
+        const onChange = vi.fn();
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+          onChange,
+        });
+
+        phone.setValue('+12025551234');
+        expect(onChange).toHaveBeenCalled();
+        expect(onChange.mock.calls[0][0]).toBe('+12025551234');
+
+        phone.destroy();
+      });
+    });
+
+    describe('interaction with other options', () => {
+      it('separateDialCode takes precedence (dial code shown in trigger)', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+          separateDialCode: true,
+        });
+
+        expect(container.querySelector('.lpi__dial-code')).toBeTruthy();
+        expect(container.querySelector('.lpi--separate-dial-code')).toBeTruthy();
+        expect(container.querySelector('.lpi--national-mode')).toBeNull();
+
+        phone.destroy();
+      });
+
+      it('works with formatAsYouType: false', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+          formatAsYouType: false,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        phone.setValue('+12025551234');
+        // Without formatting, should be raw digits
+        expect(input.value).toBe('2025551234');
+
+        phone.destroy();
+      });
+
+      it('works with strict: false', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+          strict: false,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        input.value = '2025551234';
+        input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+        expect(phone.getNationalNumber()).toBe('2025551234');
+
+        phone.destroy();
+      });
+    });
+
+    describe('runtime toggling', () => {
+      it('setOptions can enable nationalMode', () => {
+        const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+
+        phone.setValue('+12025551234');
+        phone.setOptions({ nationalMode: true });
+
+        expect(container.querySelector('.lpi--national-mode')).toBeTruthy();
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+        expect(input.value).not.toContain('+');
+
+        phone.destroy();
+      });
+
+      it('setOptions can disable nationalMode', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+
+        phone.setValue('+12025551234');
+        phone.setOptions({ nationalMode: false });
+
+        expect(container.querySelector('.lpi--national-mode')).toBeNull();
+
+        phone.destroy();
+      });
+    });
+  });
+
   describe('Android + key fallback', () => {
     it('strips + in separateDialCode strict mode', () => {
       const phone = PhoneInput.mount(container, {

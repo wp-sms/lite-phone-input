@@ -50,6 +50,7 @@ export interface PhoneInputOptions {
   formatAsYouType?: boolean;
   strict?: boolean;
   separateDialCode?: boolean;
+  nationalMode?: boolean;
   placeholder?: string | 'auto';
   disabled?: boolean;
   locale?: string;
