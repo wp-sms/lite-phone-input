@@ -91,7 +91,7 @@ lite-phone-input gives you formatting and validation in ~13KB with zero dependen
 | `showFlags` | — | Always shows emoji. Use `renderFlag` for custom |
 | `autoPlaceholder` | `placeholder: 'auto'` | No aggressive/polite modes |
 | `customPlaceholder` | `placeholder: 'string'` | No callback variant |
-| `placeholderNumberType` | — | lite generates from format mask |
+| `placeholderNumberType` | — | lite generates from example numbers |
 | `hiddenInput` (function) | `hiddenInput: { phone, country }` | Object instead of function |
 | `geoIpLookup` | — | Not supported |
 | `loadUtils` | — | Not needed (built-in) |

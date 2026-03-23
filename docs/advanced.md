@@ -99,7 +99,7 @@ phone.setOptions({
 
 ### Dynamically updatable options
 
-`disabled`, `allowedCountries`, `excludedCountries`, `preferredCountries`, `allowDropdown`, `formatAsYouType`, `strict`, `separateDialCode`, `placeholder`, `locale`, `renderFlag`
+`disabled`, `allowedCountries`, `excludedCountries`, `preferredCountries`, `allowDropdown`, `formatAsYouType`, `strict`, `separateDialCode`, `nationalMode`, `placeholder`, `locale`, `renderFlag`
 
 Options not in this list (`defaultCountry`, `hiddenInput`, `containerClass`, `dropdownContainer`, callbacks) are read once at mount time.
 
@@ -159,10 +159,10 @@ The library is split into subpath exports. Your bundler only includes what you i
 
 | Import | Contents | Approximate gzipped size |
 |---|---|---|
-| `lite-phone-input` | Core utilities + country data | ~8KB |
+| `lite-phone-input` | Core utilities + country data | ~7KB |
 | `lite-phone-input/vanilla` | PhoneInput class + core | ~13KB |
-| `lite-phone-input/react` | React adapter + core | ~13KB |
-| `lite-phone-input/preact` | Preact adapter + core | ~13KB |
+| `lite-phone-input/react` | React adapter + core | ~14KB |
+| `lite-phone-input/preact` | Preact adapter + core | ~14KB |
 | `lite-phone-input/styles` | CSS stylesheet | ~1KB |
 
 The core country data (~240 countries with format masks and validation rules) accounts for the majority of the bundle.

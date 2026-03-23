@@ -112,6 +112,15 @@ PhoneInput.mount(el, { defaultCountry: 'US', separateDialCode: false });
 
 The full number including dial code is in the input. Country auto-detects from the dial code as the user types.
 
+### National Mode
+
+```js
+PhoneInput.mount(el, { defaultCountry: 'GB', nationalMode: true });
+// [🇬🇧 ▼] [07400 123456          ]
+```
+
+Only the national number is shown — countries with a trunk prefix (like GB's "0") display it automatically. `getValue()` still returns E.164 (`+447400123456`).
+
 ## Updating Options Dynamically
 
 Use `setOptions()` to change options without remounting:

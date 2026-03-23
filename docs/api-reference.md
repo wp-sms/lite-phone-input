@@ -43,7 +43,7 @@ Pass these to `PhoneInput.mount(el, options)` (vanilla) or as props (React/Preac
 |---|---|---|---|
 | `separateDialCode` | `boolean` | `false` | Show the dial code outside the input (e.g. `+1` in the trigger area) |
 | `nationalMode` | `boolean` | `false` | Display only the national number (no dial code anywhere). Output is still E.164. If `separateDialCode` is also true, it takes precedence |
-| `placeholder` | `string \| 'auto'` | `'auto'` | `'auto'` generates from format mask. Any other string sets a custom placeholder |
+| `placeholder` | `string \| 'auto'` | `'auto'` | `'auto'` generates from country example numbers (falls back to format mask). Any other string sets a custom placeholder |
 | `disabled` | `boolean` | `false` | Disable the input and country trigger |
 
 ### Internationalization
@@ -254,6 +254,8 @@ interface Country {
   minLength: number;    // Minimum national number digit count
   maxLength: number;    // Maximum national number digit count
   priority: number;     // Priority for shared dial codes (0 = main)
+  displayNationalPrefix: boolean;  // Whether to show national prefix in display (e.g. true for GB)
+  exampleNumber: string | null;    // Example mobile number for placeholder generation
 }
 ```
 
@@ -277,6 +279,8 @@ interface CountryData {
   min: number;          // Min digit count
   max: number;          // Max digit count
   pri: number;          // Priority
+  dp?: number;          // Display national prefix flag (1 = true)
+  ex?: string | null;   // Example mobile number
 }
 ```
 

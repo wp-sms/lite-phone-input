@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-03-23
+
+### Added
+
+- **`nationalMode` option** — display and type phone numbers in national format (e.g., "07400 123456" for GB). Output remains E.164. Countries with a display prefix (like GB's "0") auto-prepend it.
+- **Example-number placeholders** — `placeholder: 'auto'` now generates realistic example numbers per country (e.g., "+1 201 555 0123" for US) instead of generic mask placeholders.
+- **New `Country` fields** — `displayNationalPrefix` and `exampleNumber` exposed on the `Country` type for programmatic use.
+
 ## [0.2.0] - 2026-03-22
 
 ### Breaking
@@ -52,5 +60,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TypeScript-first** — written in TypeScript with full type definitions
 - **Zero runtime dependencies**
 
+[0.3.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/wp-sms/lite-phone-input/releases/tag/v0.1.0
