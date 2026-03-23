@@ -22,6 +22,8 @@ export function processCountryData(raw: CountryData[]): Country[] {
     minLength: d.min,
     maxLength: d.max,
     priority: d.pri,
+    displayNationalPrefix: !!d.dp,
+    exampleNumber: d.ex ?? null,
   }));
 }
 

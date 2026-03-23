@@ -41,6 +41,8 @@ describe('processCountryData', () => {
       minLength: 10,
       maxLength: 10,
       priority: 0,
+      displayNationalPrefix: false,
+      exampleNumber: null,
     });
   });
 
@@ -55,8 +57,8 @@ describe('processCountryData', () => {
 
 describe('getCountryByCode', () => {
   const countries: Country[] = [
-    { code: 'US', name: 'United States', dialCode: '1', format: 'XXX XXX XXXX', nationalPrefix: '1', minLength: 10, maxLength: 10, priority: 0 },
-    { code: 'GB', name: 'United Kingdom', dialCode: '44', format: 'XXXX XXX XXXX', nationalPrefix: '0', minLength: 10, maxLength: 10, priority: 0 },
+    { code: 'US', name: 'United States', dialCode: '1', format: 'XXX XXX XXXX', nationalPrefix: '1', minLength: 10, maxLength: 10, priority: 0, displayNationalPrefix: false, exampleNumber: null },
+    { code: 'GB', name: 'United Kingdom', dialCode: '44', format: 'XXXX XXX XXXX', nationalPrefix: '0', minLength: 10, maxLength: 10, priority: 0, displayNationalPrefix: true, exampleNumber: null },
   ];
 
   it('finds country by uppercase code', () => {
@@ -74,9 +76,9 @@ describe('getCountryByCode', () => {
 
 describe('getCountryByDialCode', () => {
   const countries: Country[] = [
-    { code: 'US', name: 'United States', dialCode: '1', format: 'XXX XXX XXXX', nationalPrefix: '1', minLength: 10, maxLength: 10, priority: 0 },
-    { code: 'CA', name: 'Canada', dialCode: '1', format: 'XXX XXX XXXX', nationalPrefix: '1', minLength: 10, maxLength: 10, priority: 7 },
-    { code: 'GB', name: 'United Kingdom', dialCode: '44', format: 'XXXX XXX XXXX', nationalPrefix: '0', minLength: 10, maxLength: 10, priority: 0 },
+    { code: 'US', name: 'United States', dialCode: '1', format: 'XXX XXX XXXX', nationalPrefix: '1', minLength: 10, maxLength: 10, priority: 0, displayNationalPrefix: false, exampleNumber: null },
+    { code: 'CA', name: 'Canada', dialCode: '1', format: 'XXX XXX XXXX', nationalPrefix: '1', minLength: 10, maxLength: 10, priority: 7, displayNationalPrefix: false, exampleNumber: null },
+    { code: 'GB', name: 'United Kingdom', dialCode: '44', format: 'XXXX XXX XXXX', nationalPrefix: '0', minLength: 10, maxLength: 10, priority: 0, displayNationalPrefix: true, exampleNumber: null },
   ];
 
   it('returns highest-priority country for shared dial code', () => {

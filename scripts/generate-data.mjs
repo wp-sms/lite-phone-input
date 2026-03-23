@@ -166,9 +166,13 @@ function extractTerritories(doc) {
     const mainCountryForCode =
       el.getAttribute('mainCountryForCode') === 'true';
 
+    // Territory-level nationalPrefixFormattingRule (inherited by numberFormats)
+    const territoryNpfRule = el.getAttribute('nationalPrefixFormattingRule') || null;
+
     const formats = [];
     for (const nf of el.querySelectorAll('availableFormats > numberFormat')) {
       const leadingDigitsEls = nf.querySelectorAll('leadingDigits');
+      const npfRule = nf.getAttribute('nationalPrefixFormattingRule') || territoryNpfRule;
       formats.push({
         pattern: nf.getAttribute('pattern'),
         format: nf.querySelector('format')?.textContent?.trim() || null,
@@ -176,6 +180,7 @@ function extractTerritories(doc) {
         leadingDigits: Array.from(leadingDigitsEls).map((ld) =>
           ld.textContent.replace(/\s+/g, ''),
         ),
+        nationalPrefixFormattingRule: npfRule,
       });
     }
 
@@ -306,8 +311,8 @@ function verify(data, jsonStr) {
   console.log(`\nTotal countries: ${data.length}`);
 
   const checks = [
-    { c: 'US', d: '1', p: '1', min: 10, max: 10 },
-    { c: 'GB', d: '44', p: '0', min: 9, max: 10 },
+    { c: 'US', d: '1', p: '1', min: 10, max: 10, dp: undefined },
+    { c: 'GB', d: '44', p: '0', min: 9, max: 10, dp: 1 },
   ];
   for (const check of checks) {
     const entry = data.find((e) => e.c === check.c);
@@ -319,6 +324,7 @@ function verify(data, jsonStr) {
     if (entry.p !== check.p) issues.push(`${check.c} prefix: got ${entry.p}, expected ${check.p}`);
     if (entry.min !== check.min) issues.push(`${check.c} min: got ${entry.min}, expected ${check.min}`);
     if (entry.max !== check.max) issues.push(`${check.c} max: got ${entry.max}, expected ${check.max}`);
+    if (entry.dp !== check.dp) issues.push(`${check.c} dp: got ${entry.dp}, expected ${check.dp}`);
   }
 
   for (const [dialCode, group] of groupByDialCode(data)) {
@@ -394,6 +400,14 @@ async function main() {
       mask = convertToMask(selectedFormat.pattern, selectedFormat.format, example);
     }
 
+    // Derive displayPrefix flag: check if the selected format's
+    // nationalPrefixFormattingRule contains $NP (national prefix marker)
+    const npfRule = selectedFormat?.nationalPrefixFormattingRule || null;
+    const displayPrefix = (npfRule && npfRule.includes('$NP')) ? 1 : undefined;
+
+    // Example national number (mobile preferred, fallback to fixedLine)
+    const exampleNumber = t.mobileExample || t.fixedLineExample || null;
+
     let min, max;
     if (t.lengths.length > 0) {
       min = Math.min(...t.lengths);
@@ -417,6 +431,8 @@ async function main() {
       min,
       max,
       pri: 0,
+      ...(displayPrefix ? { dp: displayPrefix } : {}),
+      ...(exampleNumber ? { ex: exampleNumber } : {}),
     });
   }
 

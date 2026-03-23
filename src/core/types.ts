@@ -19,6 +19,10 @@ export interface CountryData {
   max: number;
   /** Priority for shared dial codes (0 = main) */
   pri: number;
+  /** 1 if national prefix displayed in national format */
+  dp?: number;
+  /** Example national number (mobile preferred) */
+  ex?: string | null;
 }
 
 /** Processed country object used at runtime */
@@ -31,6 +35,8 @@ export interface Country {
   minLength: number;
   maxLength: number;
   priority: number;
+  displayNationalPrefix: boolean;
+  exampleNumber: string | null;
 }
 
 export interface ValidationResult {

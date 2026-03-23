@@ -326,15 +326,15 @@ describe('PhoneInput', () => {
   });
 
   describe('placeholder', () => {
-    it('generates auto placeholder from format pattern', () => {
+    it('generates auto placeholder from example number', () => {
       const phone = PhoneInput.mount(container, {
         defaultCountry: 'US',
         separateDialCode: true,
       });
 
       const input = container.querySelector('.lpi__input') as HTMLInputElement;
-      // US format is "XXX XXX XXXX", auto placeholder should be "000 000 0000"
-      expect(input.placeholder).toBe('000 000 0000');
+      // US example number formatted: "201 555 0123"
+      expect(input.placeholder).toBe('201 555 0123');
 
       phone.destroy();
     });
@@ -484,15 +484,15 @@ describe('PhoneInput', () => {
     });
 
     describe('placeholder', () => {
-      it('generates national-only placeholder (no dial code prefix)', () => {
+      it('generates national-only placeholder from example number (no dial code prefix)', () => {
         const phone = PhoneInput.mount(container, {
           defaultCountry: 'US',
           nationalMode: true,
         });
         const input = container.querySelector('.lpi__input') as HTMLInputElement;
 
-        // US format is "XXX XXX XXXX", auto placeholder should be "000 000 0000"
-        expect(input.placeholder).toBe('000 000 0000');
+        // US example number formatted without prefix: "201 555 0123"
+        expect(input.placeholder).toBe('201 555 0123');
         expect(input.placeholder).not.toContain('+');
 
         phone.destroy();
@@ -550,7 +550,7 @@ describe('PhoneInput', () => {
         phone.destroy();
       });
 
-      it('displays national format after pasting international number', () => {
+      it('displays national format with prefix after pasting international number (GB)', () => {
         const phone = PhoneInput.mount(container, {
           defaultCountry: 'US',
           nationalMode: true,
@@ -563,7 +563,8 @@ describe('PhoneInput', () => {
         input.dispatchEvent(paste);
 
         expect(input.value).not.toContain('+');
-        expect(input.value.replace(/\s/g, '')).toBe('2071234567');
+        // GB has displayNationalPrefix, so "0" is prepended
+        expect(input.value.replace(/\s/g, '')).toBe('02071234567');
 
         phone.destroy();
       });
@@ -705,6 +706,244 @@ describe('PhoneInput', () => {
         input.dispatchEvent(new InputEvent('input', { bubbles: true }));
 
         expect(phone.getNationalNumber()).toBe('2025551234');
+
+        phone.destroy();
+      });
+    });
+
+    describe('national prefix display', () => {
+      it('UK: typing "02071234567" shows display with "0" prefix', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'GB',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        input.value = '02071234567';
+        input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+        // "0" prefix stripped then re-added by display
+        expect(input.value.startsWith('0')).toBe(true);
+        expect(input.value.replace(/\s/g, '')).toBe('02071234567');
+        expect(phone.getValue()).toBe('+442071234567');
+
+        phone.destroy();
+      });
+
+      it('UK: typing "2071234567" auto-adds "0" prefix in display', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'GB',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        input.value = '2071234567';
+        input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+        // "0" prefix auto-added by display
+        expect(input.value.startsWith('0')).toBe(true);
+        expect(input.value.replace(/\s/g, '')).toBe('02071234567');
+        expect(phone.getValue()).toBe('+442071234567');
+
+        phone.destroy();
+      });
+
+      it('UK: setValue("+442071234567") shows with "0" prefix', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'GB',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        phone.setValue('+442071234567');
+
+        expect(input.value.startsWith('0')).toBe(true);
+        expect(input.value.replace(/\s/g, '')).toBe('02071234567');
+
+        phone.destroy();
+      });
+
+      it('UK: typing just "0" shows prefix only', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'GB',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        input.value = '0';
+        input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+        // Prefix stripped to empty, display shows just "0"
+        expect(input.value).toBe('0');
+        expect(phone.getNationalNumber()).toBe('');
+
+        phone.destroy();
+      });
+
+      it('UK: paste "+442071234567" shows with "0" prefix', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'GB',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        const paste = new Event('paste', { bubbles: true }) as any;
+        paste.clipboardData = { getData: () => '+442071234567' };
+        paste.preventDefault = vi.fn();
+        input.dispatchEvent(paste);
+
+        expect(input.value.replace(/\s/g, '')).toBe('02071234567');
+        expect(phone.getValue()).toBe('+442071234567');
+
+        phone.destroy();
+      });
+
+      it('UK: paste "02071234567" shows with "0" prefix', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'GB',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        const paste = new Event('paste', { bubbles: true }) as any;
+        paste.clipboardData = { getData: () => '02071234567' };
+        paste.preventDefault = vi.fn();
+        input.dispatchEvent(paste);
+
+        expect(input.value.replace(/\s/g, '')).toBe('02071234567');
+        expect(phone.getValue()).toBe('+442071234567');
+
+        phone.destroy();
+      });
+
+      it('US: typing "2025551234" shows NO "1" prefix', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        input.value = '2025551234';
+        input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+        expect(input.value.startsWith('1')).toBe(false);
+        expect(input.value.replace(/\s/g, '')).toBe('2025551234');
+
+        phone.destroy();
+      });
+
+      it('US: typing "12025551234" strips "1", no prefix shown', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        input.value = '12025551234';
+        input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+        // US has no displayNationalPrefix, so "1" is stripped normally
+        expect(input.value.replace(/\s/g, '')).toBe('2025551234');
+
+        phone.destroy();
+      });
+
+      it('country change GB→US removes prefix display', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'GB',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        phone.setValue('+442071234567');
+        expect(input.value.startsWith('0')).toBe(true);
+
+        phone.setCountry('US');
+        // US has no displayNationalPrefix, no "1" shown
+        expect(input.value.startsWith('1')).toBe(false);
+
+        phone.destroy();
+      });
+
+      it('empty input shows no prefix', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'GB',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        expect(input.value).toBe('');
+
+        phone.destroy();
+      });
+
+      it('separateDialCode takes precedence over national prefix display', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'GB',
+          nationalMode: true,
+          separateDialCode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        phone.setValue('+442071234567');
+        // separateDialCode wins: no "0" prefix in input
+        expect(input.value.startsWith('0')).toBe(false);
+
+        phone.destroy();
+      });
+
+      it('UK: formatAsYouType: false still prepends prefix', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'GB',
+          nationalMode: true,
+          formatAsYouType: false,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        phone.setValue('+442071234567');
+        expect(input.value).toBe('02071234567');
+
+        phone.destroy();
+      });
+    });
+
+    describe('example number placeholders', () => {
+      it('GB nationalMode placeholder includes "0" prefix and example number', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'GB',
+          nationalMode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        // GB example: "7400123456" → formatted "7400 123456", with prefix "0" → "07400 123456"
+        expect(input.placeholder.startsWith('0')).toBe(true);
+        expect(input.placeholder).not.toContain('+');
+
+        phone.destroy();
+      });
+
+      it('US separateDialCode placeholder uses example number without prefix', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+          separateDialCode: true,
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        // US example: "2015550123" → formatted "201 555 0123"
+        expect(input.placeholder).toBe('201 555 0123');
+        expect(input.placeholder).not.toContain('+');
+
+        phone.destroy();
+      });
+
+      it('inline mode placeholder includes dial code + example number', () => {
+        const phone = PhoneInput.mount(container, {
+          defaultCountry: 'US',
+        });
+        const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+        // Inline mode: "+1 201 555 0123"
+        expect(input.placeholder).toBe('+1 201 555 0123');
 
         phone.destroy();
       });

@@ -298,9 +298,15 @@ export class PhoneInput {
       this.nationalDigits = digits;
 
       const formatted = this.formatNationalValue(digits);
+      const np = this.shouldPrependPrefix ? this.selectedCountry.nationalPrefix! : '';
+      // Edge case: user typed just the national prefix (e.g. "0" for GB)
+      // digits is empty after stripping, but we still show the prefix
+      const display = (!digits && np && extractDigits(raw).length > 0)
+        ? np
+        : (digits && np ? np + formatted : formatted);
 
-      const newCursor = getCursorPosition(this.inputEl.value, oldCursor, formatted);
-      this.inputEl.value = formatted;
+      const newCursor = this.getNationalCursor(this.inputEl.value, oldCursor, formatted);
+      this.inputEl.value = display;
       this.inputEl.setSelectionRange(newCursor, newCursor);
     } else {
       // Inline mode: input contains +{dialCode}{national} or just national
@@ -404,7 +410,7 @@ export class PhoneInput {
 
     // Update display
     if (this.isNationalInput) {
-      this.inputEl.value = this.formatNationalValue();
+      this.inputEl.value = this.formatNationalDisplay();
     } else {
       this.inputEl.value = this.displayInternational
         ? this.formatFullValue()
@@ -519,8 +525,12 @@ export class PhoneInput {
   private stripNationalPrefix(digits: string): string {
     const prefix = this.selectedCountry.nationalPrefix;
     if (prefix && digits.startsWith(prefix)) {
-      // Only strip if remaining digits are sufficient (avoid stripping "1" from "1")
       const remaining = digits.slice(prefix.length);
+      // Always strip when prefix will be re-added by the display layer
+      if (this.shouldPrependPrefix) {
+        return remaining;
+      }
+      // Only strip if remaining digits are sufficient (avoid stripping "1" from "1")
       if (remaining.length > 0) {
         return remaining;
       }
@@ -533,6 +543,31 @@ export class PhoneInput {
   private formatNationalValue(digits = this.nationalDigits): string {
     return this.opts.formatAsYouType !== false
       ? formatPhone(digits, this.selectedCountry.format) : digits;
+  }
+
+  /** Returns true if national prefix should be prepended to display in nationalMode */
+  private get shouldPrependPrefix(): boolean {
+    return !!this.opts.nationalMode
+      && !this.opts.separateDialCode
+      && this.selectedCountry.displayNationalPrefix
+      && !!this.selectedCountry.nationalPrefix;
+  }
+
+  private formatNationalDisplay(digits = this.nationalDigits): string {
+    const formatted = this.formatNationalValue(digits);
+    if (this.shouldPrependPrefix && digits) {
+      return this.selectedCountry.nationalPrefix + formatted;
+    }
+    return formatted;
+  }
+
+  private getNationalCursor(oldValue: string, oldCursor: number, formattedWithoutPrefix: string): number {
+    const np = this.shouldPrependPrefix ? this.selectedCountry.nationalPrefix! : '';
+    if (!np) return getCursorPosition(oldValue, oldCursor, formattedWithoutPrefix);
+
+    const oldStripped = oldValue.startsWith(np) ? oldValue.slice(np.length) : oldValue;
+    const oldCursorAdj = oldValue.startsWith(np) ? Math.max(0, oldCursor - np.length) : oldCursor;
+    return getCursorPosition(oldStripped, oldCursorAdj, formattedWithoutPrefix) + np.length;
   }
 
   private formatFullValue(): string {
@@ -560,17 +595,27 @@ export class PhoneInput {
 
     const placeholder = this.opts.placeholder;
     if (placeholder === 'auto' || placeholder === undefined) {
-      // Generate from format mask
       const mask = this.selectedCountry.format;
-      if (mask) {
-        const example = mask.replace(/X/g, '0');
-        if (this.isNationalInput) {
-          this.inputEl.placeholder = example;
+      const maskFallback = mask ? mask.replace(/X/g, '0') : '';
+      const ex = this.selectedCountry.exampleNumber;
+
+      const formattedEx = ex ? this.formatNationalValue(ex) : '';
+
+      if (this.isNationalInput) {
+        if (formattedEx) {
+          const np = this.shouldPrependPrefix ? this.selectedCountry.nationalPrefix! : '';
+          this.inputEl.placeholder = np + formattedEx;
         } else {
-          this.inputEl.placeholder = `+${this.selectedCountry.dialCode} ${example}`;
+          this.inputEl.placeholder = maskFallback;
         }
       } else {
-        this.inputEl.placeholder = '';
+        if (formattedEx) {
+          this.inputEl.placeholder = `+${this.selectedCountry.dialCode} ${formattedEx}`;
+        } else if (maskFallback) {
+          this.inputEl.placeholder = `+${this.selectedCountry.dialCode} ${maskFallback}`;
+        } else {
+          this.inputEl.placeholder = '';
+        }
       }
     } else if (placeholder) {
       this.inputEl.placeholder = placeholder;
@@ -607,7 +652,7 @@ export class PhoneInput {
     if (!this.inputEl) return;
 
     if (this.isNationalInput) {
-      this.inputEl.value = this.formatNationalValue();
+      this.inputEl.value = this.formatNationalDisplay();
     } else {
       this.inputEl.value = this.displayInternational
         ? this.formatFullValue()
