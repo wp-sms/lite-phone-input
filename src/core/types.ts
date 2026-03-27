@@ -66,6 +66,7 @@ export interface PhoneInputOptions {
   initialValue?: string;
   containerClass?: string;
   dropdownContainer?: HTMLElement;
+  geoIpLookup?: (callback: (countryCode: string | null) => void) => void;
 
   onChange?: (e164: string, country: Country, validation: ValidationResult) => void;
   onCountryChange?: (country: Country) => void;

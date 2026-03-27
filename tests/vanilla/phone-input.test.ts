@@ -1236,4 +1236,193 @@ describe('PhoneInput', () => {
       phone.destroy();
     });
   });
+
+  describe('geoIpLookup', () => {
+    it('updates country when callback fires before interaction', () => {
+      let cb: (code: string | null) => void;
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        geoIpLookup: (callback) => { cb = callback; },
+      });
+
+      cb!('GB');
+      expect(phone.getCountry().code).toBe('GB');
+
+      phone.destroy();
+    });
+
+    it('handles synchronous callback', () => {
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        geoIpLookup: (callback) => { callback('DE'); },
+      });
+
+      expect(phone.getCountry().code).toBe('DE');
+
+      phone.destroy();
+    });
+
+    it('ignores callback after user types', () => {
+      let cb: (code: string | null) => void;
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        geoIpLookup: (callback) => { cb = callback; },
+      });
+
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+      input.value = '2';
+      input.dispatchEvent(new InputEvent('input', { data: '2' }));
+
+      cb!('GB');
+      expect(phone.getCountry().code).toBe('US');
+
+      phone.destroy();
+    });
+
+    it('ignores callback after dropdown opens', () => {
+      let cb: (code: string | null) => void;
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        geoIpLookup: (callback) => { cb = callback; },
+      });
+
+      const trigger = container.querySelector('.lpi__trigger') as HTMLButtonElement;
+      trigger.click();
+
+      cb!('GB');
+      expect(phone.getCountry().code).toBe('US');
+
+      phone.destroy();
+    });
+
+    it('ignores callback after user pastes', () => {
+      let cb: (code: string | null) => void;
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        geoIpLookup: (callback) => { cb = callback; },
+      });
+
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+      const pasteEvent = new Event('paste', { bubbles: true }) as any;
+      pasteEvent.clipboardData = { getData: () => '202' };
+      input.dispatchEvent(pasteEvent);
+
+      cb!('GB');
+      expect(phone.getCountry().code).toBe('US');
+
+      phone.destroy();
+    });
+
+    it('stays on defaultCountry when callback returns null', () => {
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        geoIpLookup: (callback) => { callback(null); },
+      });
+
+      expect(phone.getCountry().code).toBe('US');
+
+      phone.destroy();
+    });
+
+    it('stays unchanged when callback returns invalid code', () => {
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        geoIpLookup: (callback) => { callback('XX'); },
+      });
+
+      expect(phone.getCountry().code).toBe('US');
+
+      phone.destroy();
+    });
+
+    it('stays unchanged when callback returns country not in allowedCountries', () => {
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        allowedCountries: ['US', 'CA'],
+        geoIpLookup: (callback) => { callback('GB'); },
+      });
+
+      expect(phone.getCountry().code).toBe('US');
+
+      phone.destroy();
+    });
+
+    it('does not throw after destroy', () => {
+      let cb: (code: string | null) => void;
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        geoIpLookup: (callback) => { cb = callback; },
+      });
+
+      phone.destroy();
+      expect(() => cb!('GB')).not.toThrow();
+    });
+
+    it('is not re-invoked via setOptions', () => {
+      const lookup = vi.fn((callback: (code: string | null) => void) => {
+        callback('GB');
+      });
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        geoIpLookup: lookup,
+      });
+
+      expect(lookup).toHaveBeenCalledTimes(1);
+      phone.setOptions({ disabled: false });
+      expect(lookup).toHaveBeenCalledTimes(1);
+
+      phone.destroy();
+    });
+
+    it('fires onCountryChange on geo result', () => {
+      const onCountryChange = vi.fn();
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        onCountryChange,
+        geoIpLookup: (callback) => { callback('GB'); },
+      });
+
+      expect(onCountryChange).toHaveBeenCalledTimes(1);
+      expect(onCountryChange.mock.calls[0][0].code).toBe('GB');
+
+      phone.destroy();
+    });
+
+    it('handles case-insensitive country code', () => {
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        geoIpLookup: (callback) => { callback('gb'); },
+      });
+
+      expect(phone.getCountry().code).toBe('GB');
+
+      phone.destroy();
+    });
+
+    it('handles async callback via setTimeout', async () => {
+      let cb: (code: string | null) => void;
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+        geoIpLookup: (callback) => {
+          setTimeout(() => callback('FR'), 0);
+        },
+      });
+
+      expect(phone.getCountry().code).toBe('US');
+      await new Promise((r) => setTimeout(r, 10));
+      expect(phone.getCountry().code).toBe('FR');
+
+      phone.destroy();
+    });
+
+    it('works normally without geoIpLookup option', () => {
+      const phone = PhoneInput.mount(container, {
+        defaultCountry: 'US',
+      });
+
+      expect(phone.getCountry().code).toBe('US');
+
+      phone.destroy();
+    });
+  });
 });

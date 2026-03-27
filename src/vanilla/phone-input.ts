@@ -13,6 +13,7 @@ export class PhoneInput {
   private selectedCountry: Country;
   private nationalDigits = '';
   private displayInternational = false;
+  private userHasInteracted = false;
 
   private get isNationalInput(): boolean {
     return !!this.opts.separateDialCode || !!this.opts.nationalMode;
@@ -50,6 +51,8 @@ export class PhoneInput {
       if (this.opts.initialValue) {
         this.setValueInternal(this.opts.initialValue, true);
       }
+
+      this.invokeGeoIpLookup();
     }
   }
 
@@ -94,8 +97,9 @@ export class PhoneInput {
   }
 
   setOptions(opts: Partial<PhoneInputOptions>): void {
+    const { geoIpLookup: _, ...rest } = opts;
     const prev = { ...this.opts };
-    Object.assign(this.opts, opts);
+    Object.assign(this.opts, rest);
 
     // Re-filter countries if filter options changed
     if (opts.allowedCountries !== undefined || opts.excludedCountries !== undefined) {
@@ -148,6 +152,18 @@ export class PhoneInput {
       this.dropdown = null;
     }
     this.el.innerHTML = '';
+  }
+
+  private invokeGeoIpLookup(): void {
+    const lookup = this.opts.geoIpLookup;
+    if (!lookup) return;
+    this.opts.geoIpLookup = undefined;
+    const signal = this.ac.signal;
+
+    lookup((countryCode) => {
+      if (signal.aborted || this.userHasInteracted || !countryCode) return;
+      this.setCountry(countryCode);
+    });
   }
 
   // --- DOM Construction ---
@@ -274,6 +290,7 @@ export class PhoneInput {
   }
 
   private handleInput(e: InputEvent): void {
+    this.userHasInteracted = true;
     // Android sends e.key="Unidentified" for +, so keydown can't filter it.
     // Fall back to InputEvent.data (same approach as intl-tel-input).
     if (this.opts.strict !== false && e.data === '+' && this.isNationalInput) {
@@ -382,6 +399,7 @@ export class PhoneInput {
   }
 
   private handlePaste(e: ClipboardEvent): void {
+    this.userHasInteracted = true;
     e.preventDefault();
     const text = e.clipboardData?.getData('text') ?? '';
     if (!text) return;
@@ -435,6 +453,7 @@ export class PhoneInput {
 
   private openDropdown(): void {
     if (this.dropdown) return;
+    this.userHasInteracted = true;
 
     this.dropdown = new Dropdown({
       countries: this.countries,

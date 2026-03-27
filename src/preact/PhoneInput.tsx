@@ -21,7 +21,7 @@ const WIDGET_KEYS = new Set<string>([
   'defaultCountry', 'allowedCountries', 'excludedCountries', 'preferredCountries',
   'allowDropdown', 'formatAsYouType', 'strict', 'separateDialCode', 'nationalMode',
   'placeholder', 'disabled', 'locale', 'renderFlag', 'hiddenInput',
-  'initialValue', 'containerClass', 'dropdownContainer',
+  'initialValue', 'containerClass', 'dropdownContainer', 'geoIpLookup',
   'onChange', 'onCountryChange', 'onValidationChange', 'onDropdownOpen', 'onDropdownClose',
 ]);
 
@@ -76,6 +76,7 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
         hiddenInput: p.hiddenInput,
         containerClass: p.containerClass,
         dropdownContainer: p.dropdownContainer,
+        geoIpLookup: p.geoIpLookup,
         initialValue: p.initialValue,
         inputAttributes,
         onChange: (e164, country, validation) =>

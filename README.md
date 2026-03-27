@@ -97,6 +97,36 @@ Same API as React. Uses `preact/hooks` directly — no `preact/compat` required.
 </script>
 ```
 
+## Geo IP Lookup
+
+Auto-detect the user's country at mount time using any geo-IP service. The lookup runs once, and the result is ignored if the user has already interacted with the widget.
+
+```js
+const phone = PhoneInput.mount(document.getElementById('phone'), {
+  defaultCountry: 'US',
+  geoIpLookup: (callback) => {
+    // Cloudflare (free, no API key)
+    fetch('/cdn-cgi/trace')
+      .then(res => res.text())
+      .then(text => {
+        const match = text.match(/loc=(\w+)/);
+        callback(match ? match[1] : null);
+      })
+      .catch(() => callback(null));
+  },
+});
+```
+
+```js
+// Alternative: ipapi.co
+geoIpLookup: (callback) => {
+  fetch('https://ipapi.co/json/')
+    .then(res => res.json())
+    .then(data => callback(data.country_code))
+    .catch(() => callback(null));
+}
+```
+
 ## Documentation
 
 | Guide | Description |
