@@ -81,6 +81,12 @@ Pass these to `PhoneInput.mount(el, options)` (vanilla) or as props (React/Preac
 | `onDropdownOpen` | `() => void` | Fires when the country dropdown opens |
 | `onDropdownClose` | `() => void` | Fires when the country dropdown closes |
 
+### Geo IP Lookup
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `geoIpLookup` | `(callback: (countryCode: string \| null) => void) => void` | `undefined` | Auto-detect user's country at mount time. Runs once; result is ignored if the user has already interacted. Pass `null` to the callback on failure |
+
 ### Advanced
 
 | Option | Type | Default | Description |
@@ -318,6 +324,7 @@ interface PhoneInputOptions {
   initialValue?: string;
   containerClass?: string;
   dropdownContainer?: HTMLElement;
+  geoIpLookup?: (callback: (countryCode: string | null) => void) => void;
 
   onChange?: (e164: string, country: Country, validation: ValidationResult) => void;
   onCountryChange?: (country: Country) => void;

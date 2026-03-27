@@ -44,7 +44,7 @@ lite-phone-input gives you formatting and validation in ~13KB with zero dependen
 | **Validation** | libphonenumber (utils required) | Length-based (built-in) | lite validates min/max digit count per country |
 | **Number type detection** | Yes (MOBILE, FIXED_LINE, etc.) | No | — |
 | **Multiple number formats** | E.164, INTERNATIONAL, NATIONAL, RFC3966 | E.164 only | lite always outputs E.164 |
-| **Country auto-detect (IP)** | Yes (`geoIpLookup`) | No | — |
+| **Country auto-detect (IP)** | Yes (`geoIpLookup`) | Yes (`geoIpLookup`) | Same callback pattern |
 | **Country search** | Yes (`countrySearch: true`) | Yes (always enabled) | — |
 | **Separate dial code** | Yes | Yes | Same option name |
 | **Strict mode** | Yes (`strictMode`) | Yes (`strict`) | Same behavior |
@@ -76,7 +76,7 @@ lite-phone-input gives you formatting and validation in ~13KB with zero dependen
 | intl-tel-input | lite-phone-input | Notes |
 |---|---|---|
 | `initialCountry` | `defaultCountry` | Required in lite (no empty default) |
-| `initialCountry: "auto"` | — | No IP-based auto-detection |
+| `initialCountry: "auto"` | `geoIpLookup` option | Same callback pattern; use `defaultCountry` as fallback |
 | `onlyCountries` | `allowedCountries` | Same behavior |
 | `excludeCountries` | `excludedCountries` | Same behavior |
 | `countryOrder` | `preferredCountries` | Shows preferred at top |
@@ -93,7 +93,7 @@ lite-phone-input gives you formatting and validation in ~13KB with zero dependen
 | `customPlaceholder` | `placeholder: 'string'` | No callback variant |
 | `placeholderNumberType` | — | lite generates from example numbers |
 | `hiddenInput` (function) | `hiddenInput: { phone, country }` | Object instead of function |
-| `geoIpLookup` | — | Not supported |
+| `geoIpLookup` | `geoIpLookup` | Same callback pattern |
 | `loadUtils` | — | Not needed (built-in) |
 | `i18n` (UI strings) | — | No UI string translations |
 | `countryNameLocale` | `locale` | Both use `Intl.DisplayNames` |
@@ -210,19 +210,18 @@ PhoneInput.mount(el, {
 
 If you rely on any of these features, evaluate whether you need them before migrating:
 
-1. **IP-based country detection** — `geoIpLookup` + `initialCountry: "auto"`
-2. **Number type detection** — MOBILE, FIXED_LINE, TOLL_FREE, etc.
-3. **Multiple output formats** — NATIONAL, INTERNATIONAL, RFC3966 (E.164 only)
-4. **Precise validation** — full libphonenumber rules
-5. **Vue / Angular / Svelte adapters**
-6. **UI string translations** — 46+ languages
-7. **Number extensions** and **phonewords**
-8. **Granular placeholder control** — aggressive/polite modes, number type, custom callback
-9. **Area code disambiguation** for shared dial codes (e.g. US vs Canada for `+1`)
-10. **`dropdownAlwaysOpen`** mode
-11. **`fixDropdownWidth`** control
-12. **`showFlags: false`** — hide flags entirely
-13. **Global instance registry** — `intlTelInput.getInstance(input)`
+1. **Number type detection** — MOBILE, FIXED_LINE, TOLL_FREE, etc.
+2. **Multiple output formats** — NATIONAL, INTERNATIONAL, RFC3966 (E.164 only)
+3. **Precise validation** — full libphonenumber rules
+4. **Vue / Angular / Svelte adapters**
+5. **UI string translations** — 46+ languages
+6. **Number extensions** and **phonewords**
+7. **Granular placeholder control** — aggressive/polite modes, number type, custom callback
+8. **Area code disambiguation** for shared dial codes (e.g. US vs Canada for `+1`)
+9. **`dropdownAlwaysOpen`** mode
+10. **`fixDropdownWidth`** control
+11. **`showFlags: false`** — hide flags entirely
+12. **Global instance registry** — `intlTelInput.getInstance(input)`
 
 ---
 

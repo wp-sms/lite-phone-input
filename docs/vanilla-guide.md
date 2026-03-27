@@ -147,6 +147,8 @@ phone.setOptions({ formatAsYouType: false });
 
 Supported dynamic options: `disabled`, `allowedCountries`, `excludedCountries`, `preferredCountries`, `allowDropdown`, `formatAsYouType`, `strict`, `separateDialCode`, `placeholder`, `locale`, `renderFlag`.
 
+Mount-only options (cannot be changed via `setOptions`): `defaultCountry`, `initialValue`, `hiddenInput`, `containerClass`, `dropdownContainer`, `geoIpLookup`, `inputAttributes`.
+
 ## Multiple Instances
 
 Each `mount()` call creates an independent instance:
