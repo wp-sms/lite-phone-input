@@ -56,7 +56,7 @@ lite-phone-input gives you formatting and validation in ~13KB with zero dependen
 | **Dropdown portal** | `dropdownContainer` | `dropdownContainer` | Same concept |
 | **Fullscreen mobile** | `useFullscreenPopup` | Auto via CSS media query | lite uses CSS, not configurable |
 | **i18n (UI strings)** | 46+ language packs | No | lite only localizes country names via `Intl.DisplayNames` |
-| **Arabic/Persian numerals** | Supported | Supported | lite uses `normalizeNumerals()` |
+| **Non-ASCII numeral normalization** | Supported (Arabic-Indic, Persian) | Supported (9 systems) | lite normalizes Arabic-Indic, Persian, Devanagari, Bengali, Thai, Lao, Myanmar, Khmer, and Fullwidth via `normalizeNumerals()` |
 | **RTL support** | Yes | Yes | Both use `dir="ltr"` on input |
 | **SSR safe** | Yes | Yes | Both guard `typeof window` |
 | **TypeScript** | Full definitions | TypeScript-first | lite is written in TypeScript |

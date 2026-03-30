@@ -153,12 +153,15 @@ extractDigits('abc');                // ''
 
 ### normalizeNumerals
 
-Convert Arabic-Indic (٠–٩) and Persian (۰–۹) numerals to ASCII digits (0–9).
+Convert non-ASCII numerals to ASCII digits (0–9). Supports 9 numeral systems: Arabic-Indic, Persian, Devanagari, Bengali, Thai, Lao, Myanmar, Khmer, and Fullwidth.
 
 ```js
-normalizeNumerals('٠١٢٣٤٥٦٧٨٩'); // '0123456789'
-normalizeNumerals('۰۱۲۳');          // '0123'
-normalizeNumerals('123');            // '123' (ASCII passes through)
+normalizeNumerals('٠١٢٣٤٥٦٧٨٩'); // '0123456789' (Arabic-Indic)
+normalizeNumerals('۰۱۲۳');          // '0123'       (Persian)
+normalizeNumerals('०१२३');          // '0123'       (Devanagari)
+normalizeNumerals('๐๑๒๓');          // '0123'       (Thai)
+normalizeNumerals('０１２３');       // '0123'       (Fullwidth)
+normalizeNumerals('123');            // '123'        (ASCII passes through)
 ```
 
 **Signature:** `(value: string) => string`

@@ -213,7 +213,7 @@ Imported from the root `'lite-phone-input'` path. Framework-agnostic, usable on 
 | `getAllCountries` | `() => Country[]` | Get the full processed country list (~240 countries) |
 | `getNationalNumber` | `(e164: string, countryCode?: string) => string` | Extract national number from an E.164 string, stripping dial code and national prefix |
 | `extractDigits` | `(value: string) => string` | Strip all non-digit characters |
-| `normalizeNumerals` | `(value: string) => string` | Convert Arabic-Indic (٠–٩) and Persian (۰–۹) numerals to ASCII (0–9) |
+| `normalizeNumerals` | `(value: string) => string` | Convert non-ASCII numerals to ASCII (0–9). Supports 9 systems: Arabic-Indic, Persian, Devanagari, Bengali, Thai, Lao, Myanmar, Khmer, and Fullwidth |
 | `getCursorPosition` | `(oldValue: string, oldCursor: number, newValue: string) => number` | Calculate new cursor position after formatting |
 | `processCountryData` | `(raw: CountryData[]) => Country[]` | Convert raw JSON country data to `Country[]` objects |
 | `countries` | `Country[]` (constant) | Pre-processed array of all supported countries |

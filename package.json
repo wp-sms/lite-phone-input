@@ -1,6 +1,6 @@
 {
   "name": "lite-phone-input",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Lightweight phone input with formatting, validation, and emoji flags — ~13KB gzipped",
   "license": "MIT",
   "type": "module",

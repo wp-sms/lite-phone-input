@@ -108,7 +108,7 @@ Options not in this list (`defaultCountry`, `hiddenInput`, `containerClass`, `dr
 When a user pastes text:
 
 1. Non-digit characters are stripped
-2. Arabic-Indic / Persian numerals are normalized to ASCII
+2. Non-ASCII numerals (9 systems) are normalized to ASCII
 3. If the text starts with `+` or `00`, it's treated as an international number:
    - `00` prefix is stripped (converted to `+`)
    - Country is auto-detected from the dial code
