@@ -1425,4 +1425,121 @@ describe('PhoneInput', () => {
       phone.destroy();
     });
   });
+
+  describe('non-ASCII numeral input', () => {
+    it('normalizes Persian digits to ASCII on input', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'IR' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      input.value = '۹۱۲۳۴۵۶۷۸۹';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+      expect(phone.getNationalNumber()).toBe('9123456789');
+      phone.destroy();
+    });
+
+    it('normalizes Arabic-Indic digits to ASCII on input', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'SA' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      input.value = '٥١٢٣٤٥٦٧٨';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+      expect(phone.getNationalNumber()).toBe('512345678');
+      phone.destroy();
+    });
+
+    it('normalizes Devanagari digits to ASCII on input', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'IN' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      input.value = '९८७६५४३२१०';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+      expect(phone.getNationalNumber()).toBe('9876543210');
+      phone.destroy();
+    });
+
+    it('handles pasting Persian international number', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      const paste = new Event('paste', { bubbles: true }) as any;
+      paste.clipboardData = { getData: () => '+۹۸۹۱۲۳۴۵۶۷۸۹' };
+      paste.preventDefault = vi.fn();
+      input.dispatchEvent(paste);
+
+      expect(phone.getCountry().code).toBe('IR');
+      phone.destroy();
+    });
+
+    it('handles pasting Thai digits', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'TH' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      const paste = new Event('paste', { bubbles: true }) as any;
+      paste.clipboardData = { getData: () => '๐๘๑๒๓๔๕๖๗๘' };
+      paste.preventDefault = vi.fn();
+      input.dispatchEvent(paste);
+
+      expect(phone.getNationalNumber()).toMatch(/^[0-9]+$/);
+      phone.destroy();
+    });
+
+    it('handleKeyDown allows Persian digit through in strict mode', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'IR' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      const event = new KeyboardEvent('keydown', { key: '۵', bubbles: true });
+      const spy = vi.spyOn(event, 'preventDefault');
+      input.dispatchEvent(event);
+
+      expect(spy).not.toHaveBeenCalled();
+      phone.destroy();
+    });
+
+    it('handleKeyDown allows Devanagari digit through in strict mode', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'IN' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      const event = new KeyboardEvent('keydown', { key: '५', bubbles: true });
+      const spy = vi.spyOn(event, 'preventDefault');
+      input.dispatchEvent(event);
+
+      expect(spy).not.toHaveBeenCalled();
+      phone.destroy();
+    });
+
+    it('handleKeyDown still blocks non-digit characters', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'IR' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      const event = new KeyboardEvent('keydown', { key: 'ب', bubbles: true, cancelable: true });
+      input.dispatchEvent(event);
+
+      expect(event.defaultPrevented).toBe(true);
+      phone.destroy();
+    });
+
+    it('setValue handles Persian E.164 input', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US' });
+
+      phone.setValue('+۹۸۹۱۲۳۴۵۶۷۸۹');
+
+      expect(phone.getCountry().code).toBe('IR');
+      expect(phone.getNationalNumber()).toMatch(/^[0-9]+$/);
+      phone.destroy();
+    });
+
+    it('handles mixed ASCII and Persian digits', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'IR' });
+      const input = container.querySelector('.lpi__input') as HTMLInputElement;
+
+      input.value = '9۱2۳4۵6۷8۹';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true }));
+
+      expect(phone.getNationalNumber()).toBe('9123456789');
+      phone.destroy();
+    });
+  });
 });

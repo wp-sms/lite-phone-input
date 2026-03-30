@@ -1,6 +1,6 @@
 import type { Country, PhoneInputOptions, ValidationResult } from '../core/types';
 import { getAllCountries, getCountryByCode, getCountryByDialCode, getFlag } from '../core/countries';
-import { formatPhone, getCursorPosition, extractDigits, normalizeNumerals } from '../core/format';
+import { formatPhone, getCursorPosition, extractDigits, normalizeNumerals, isNonAsciiDigit } from '../core/format';
 import { validatePhone } from '../core/validate';
 import { Dropdown } from './dropdown';
 
@@ -322,7 +322,7 @@ export class PhoneInput {
         ? np
         : (digits && np ? np + formatted : formatted);
 
-      const newCursor = this.getNationalCursor(this.inputEl.value, oldCursor, formatted);
+      const newCursor = this.getNationalCursor(raw, oldCursor, formatted);
       this.inputEl.value = display;
       this.inputEl.setSelectionRange(newCursor, newCursor);
     } else {
@@ -360,7 +360,7 @@ export class PhoneInput {
         formatted = this.formatNationalValue(national);
       }
 
-      const newCursor = getCursorPosition(this.inputEl.value, oldCursor, formatted);
+      const newCursor = getCursorPosition(raw, oldCursor, formatted);
       this.inputEl.value = formatted;
       this.inputEl.setSelectionRange(newCursor, newCursor);
     }
@@ -388,13 +388,9 @@ export class PhoneInput {
       return;
     }
 
-    // Allow digits only
-    if (e.key.length === 1 && !/\d/.test(e.key)) {
-      // Also allow Arabic-Indic and Persian numerals
-      const code = e.key.charCodeAt(0);
-      if (!((code >= 0x0660 && code <= 0x0669) || (code >= 0x06F0 && code <= 0x06F9))) {
-        e.preventDefault();
-      }
+    // Allow digits only (ASCII + all supported non-ASCII numeral systems)
+    if (e.key.length === 1 && !/\d/.test(e.key) && !isNonAsciiDigit(e.key)) {
+      e.preventDefault();
     }
   }
 

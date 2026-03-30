@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatPhone, getCursorPosition, extractDigits, normalizeNumerals } from '../../src/core/format';
+import { formatPhone, getCursorPosition, extractDigits, normalizeNumerals, isNonAsciiDigit } from '../../src/core/format';
 
 describe('formatPhone', () => {
   it('formats digits according to mask', () => {
@@ -63,5 +63,80 @@ describe('normalizeNumerals', () => {
 
   it('passes ASCII through unchanged', () => {
     expect(normalizeNumerals('0123456789')).toBe('0123456789');
+  });
+
+  it('converts Devanagari to ASCII', () => {
+    expect(normalizeNumerals('०१२३४५६७८९')).toBe('0123456789');
+  });
+
+  it('converts Bengali to ASCII', () => {
+    expect(normalizeNumerals('০১২৩৪৫৬৭৮৯')).toBe('0123456789');
+  });
+
+  it('converts Thai to ASCII', () => {
+    expect(normalizeNumerals('๐๑๒๓๔๕๖๗๘๙')).toBe('0123456789');
+  });
+
+  it('converts Lao to ASCII', () => {
+    expect(normalizeNumerals('໐໑໒໓໔໕໖໗໘໙')).toBe('0123456789');
+  });
+
+  it('converts Myanmar to ASCII', () => {
+    expect(normalizeNumerals('၀၁၂၃၄၅၆၇၈၉')).toBe('0123456789');
+  });
+
+  it('converts Khmer to ASCII', () => {
+    expect(normalizeNumerals('០១២៣៤៥៦៧៨៩')).toBe('0123456789');
+  });
+
+  it('converts Fullwidth to ASCII', () => {
+    expect(normalizeNumerals('０１２３４５６７８９')).toBe('0123456789');
+  });
+
+  it('handles mixed numeral systems', () => {
+    expect(normalizeNumerals('۱2३4')).toBe('1234');
+  });
+
+  it('preserves non-digit characters during normalization', () => {
+    expect(normalizeNumerals('+۹۸ ۹۱۲')).toBe('+98 912');
+  });
+
+  it('preserves string length after normalization', () => {
+    const persian = '۰۱۲۳۴۵۶۷۸۹';
+    expect(normalizeNumerals(persian).length).toBe(persian.length);
+  });
+});
+
+describe('isNonAsciiDigit', () => {
+  it('returns true for Persian digits', () => {
+    expect(isNonAsciiDigit('۱')).toBe(true);
+  });
+
+  it('returns true for Arabic-Indic digits', () => {
+    expect(isNonAsciiDigit('٥')).toBe(true);
+  });
+
+  it('returns true for Devanagari digits', () => {
+    expect(isNonAsciiDigit('३')).toBe(true);
+  });
+
+  it('returns true for Thai digits', () => {
+    expect(isNonAsciiDigit('๕')).toBe(true);
+  });
+
+  it('returns true for Fullwidth digits', () => {
+    expect(isNonAsciiDigit('５')).toBe(true);
+  });
+
+  it('returns false for ASCII digits', () => {
+    expect(isNonAsciiDigit('5')).toBe(false);
+  });
+
+  it('returns false for letters', () => {
+    expect(isNonAsciiDigit('a')).toBe(false);
+  });
+
+  it('returns false for Arabic letters', () => {
+    expect(isNonAsciiDigit('ب')).toBe(false);
   });
 });
