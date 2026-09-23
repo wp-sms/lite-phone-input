@@ -10,13 +10,15 @@ export interface CountryData {
   /** Dial code without + */
   d: string;
   /** Format mask (X = digit) */
-  f: string;
+  f: string | null;
   /** National prefix (e.g., "0") or null */
   p: string | null;
   /** Minimum national number digit count */
   min: number;
   /** Maximum national number digit count */
   max: number;
+  /** Exact possible lengths when the range has gaps. */
+  l?: number[];
   /** Priority for shared dial codes (0 = main) */
   pri: number;
   /** 1 if national prefix displayed in national format */
@@ -30,10 +32,11 @@ export interface Country {
   code: CountryCode;
   name: string;
   dialCode: string;
-  format: string;
+  format: string | null;
   nationalPrefix: string | null;
   minLength: number;
   maxLength: number;
+  possibleLengths?: number[];
   priority: number;
   displayNationalPrefix: boolean;
   exampleNumber: string | null;
@@ -41,7 +44,7 @@ export interface Country {
 
 export interface ValidationResult {
   valid: boolean;
-  reason?: 'too_short' | 'too_long';
+  reason?: 'too_short' | 'too_long' | 'invalid_length' | 'invalid_country';
   minDigits: number;
   maxDigits: number;
   currentDigits: number;

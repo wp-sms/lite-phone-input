@@ -74,7 +74,7 @@ function PhoneForm() {
 ## TypeScript
 
 ```tsx
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { PhoneInput, type PhoneInputRef } from 'lite-phone-input/react';
 import type { ValidationResult } from 'lite-phone-input';
 
@@ -89,7 +89,7 @@ import type { PhoneInputProps } from 'lite-phone-input/react';
 
 ## HTML Attribute Forwarding
 
-Props not recognized as widget options are forwarded to the underlying `<input>` element:
+Input attributes, boolean props, styles, and native DOM event handlers are synchronized onto the underlying input. Removed props are removed from the DOM. `value` and `defaultValue` are not supported; use `initialValue` and ref methods. Event props receive native DOM events rather than React SyntheticEvents:
 
 ```jsx
 <PhoneInput
@@ -120,81 +120,20 @@ phoneRef.current.isValid();            // true
 phoneRef.current.validate();           // { valid: true, ... }
 
 // Write
+phoneRef.current.focus();
+phoneRef.current.reset();
+phoneRef.current.getInput();           // underlying HTMLInputElement
 phoneRef.current.setValue('+442071234567');
 phoneRef.current.setCountry('GB');
 ```
 
-## React Hook Form
+## Form libraries
 
-```tsx
-import { useForm, Controller } from 'react-hook-form';
-import { PhoneInput } from 'lite-phone-input/react';
-import 'lite-phone-input/styles';
-
-function PhoneForm() {
-  const { control, handleSubmit } = useForm();
-
-  return (
-    <form onSubmit={handleSubmit((data) => console.log(data))}>
-      <Controller
-        name="phone"
-        control={control}
-        rules={{
-          validate: (value) => {
-            // value is the E.164 string
-            return value.length > 3 || 'Phone number is required';
-          },
-        }}
-        render={({ field }) => (
-          <PhoneInput
-            defaultCountry="US"
-            separateDialCode
-            initialValue={field.value}
-            onChange={(e164) => field.onChange(e164)}
-            name={field.name}
-          />
-        )}
-      />
-      <button type="submit">Submit</button>
-    </form>
-  );
-}
-```
-
-For ref-based validation, use `phoneRef.current.isValid()` inside the `validate` rule.
-
-## Formik
-
-```tsx
-import { Formik, Form, Field } from 'formik';
-import { PhoneInput } from 'lite-phone-input/react';
-import 'lite-phone-input/styles';
-
-function PhoneForm() {
-  return (
-    <Formik
-      initialValues={{ phone: '' }}
-      onSubmit={(values) => console.log(values)}
-    >
-      {({ setFieldValue, values }) => (
-        <Form>
-          <PhoneInput
-            defaultCountry="US"
-            initialValue={values.phone}
-            onChange={(e164) => setFieldValue('phone', e164)}
-            name="phone"
-          />
-          <button type="submit">Submit</button>
-        </Form>
-      )}
-    </Formik>
-  );
-}
-```
+See [Form Integration](form-integration.md) for complete React Hook Form and Formik bridges. The examples synchronize programmatic changes and reset through `setValue()`, report blur/touched state, and support focus via the ref. Passing a changing form value as `initialValue` alone does not synchronize it after mount.
 
 ## Next.js / SSR
 
-The component is SSR-safe — it guards browser APIs behind `typeof window` checks. No special configuration needed:
+The React export includes a `"use client"` boundary. Server rendering is safe and produces an empty wrapper; the actual input mounts in the browser. A server page may render the component with serializable options:
 
 ```tsx
 // app/page.tsx (App Router) or pages/index.tsx (Pages Router)
@@ -206,9 +145,11 @@ export default function Page() {
 }
 ```
 
-If you use dynamic imports:
+For callbacks, refs, or dynamic imports with `ssr: false`, put the consuming component behind its own `'use client'` boundary:
 
 ```tsx
+'use client';
+
 import dynamic from 'next/dynamic';
 
 const PhoneInput = dynamic(
@@ -220,7 +161,7 @@ const PhoneInput = dynamic(
 ## Complete Form Example
 
 ```tsx
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { PhoneInput, type PhoneInputRef } from 'lite-phone-input/react';
 import type { ValidationResult } from 'lite-phone-input';
 import 'lite-phone-input/styles';
@@ -236,6 +177,8 @@ function ContactForm() {
       setError(`Too short — need at least ${v.minDigits} digits`);
     } else if (v.reason === 'too_long') {
       setError(`Too long — max ${v.maxDigits} digits`);
+    } else {
+      setError('Check the country code and phone number length');
     }
   };
 
@@ -256,8 +199,7 @@ function ContactForm() {
         defaultCountry="US"
         separateDialCode
         preferredCountries={['US', 'GB', 'CA']}
-        onChange={(e164) => console.log(e164)}
-        onValidationChange={handleValidation}
+        onChange={(e164, country, validation) => handleValidation(validation)}
         id="phone"
         name="phone"
         aria-label="Phone number"

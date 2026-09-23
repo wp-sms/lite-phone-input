@@ -6,12 +6,14 @@
 
 lite-phone-input is SSR-safe. The vanilla `PhoneInput` class guards all browser API calls behind a `typeof window !== 'undefined'` check. The React and Preact adapters mount the widget inside a `useEffect`, which only runs in the browser.
 
-No special configuration is needed for Next.js, Nuxt, Astro, or any other SSR framework.
+The React export includes a client boundary for Next.js App Router. Rendering on the server produces an empty wrapper; the interactive input is created after mount. Use a Client Component for callbacks and refs.
 
 If you want to lazy-load the component client-side only:
 
 ```tsx
-// Next.js App Router
+// Inside a Client Component
+'use client';
+
 import dynamic from 'next/dynamic';
 
 const PhoneInput = dynamic(
@@ -101,26 +103,17 @@ phone.setOptions({
 
 `disabled`, `allowedCountries`, `excludedCountries`, `preferredCountries`, `allowDropdown`, `formatAsYouType`, `strict`, `separateDialCode`, `nationalMode`, `placeholder`, `locale`, `renderFlag`
 
-Options not in this list (`defaultCountry`, `hiddenInput`, `containerClass`, `dropdownContainer`, callbacks) are read once at mount time.
+Other configuration options are intended for mount time. React/Preact callbacks always use the latest props. Vanilla `inputAttributes` can also be replaced through `setOptions()`.
 
-## Paste Handling
+## Input and Paste Handling
 
-When a user pastes text:
+Typed values, browser input replacements, paste, and `setValue()` share international-prefix parsing. Leading/trailing whitespace is ignored and supported non-ASCII numerals are normalized. A leading `+` or `00` selects the matching allowed country.
 
-1. Non-digit characters are stripped
-2. Non-ASCII numerals (9 systems) are normalized to ASCII
-3. If the text starts with `+` or `00`, it's treated as an international number:
-   - `00` prefix is stripped (converted to `+`)
-   - Country is auto-detected from the dial code
-   - National number is extracted
-4. In strict mode, digits exceeding max length are truncated
-5. The input is reformatted with the detected country's mask
+Pasting an international number replaces the complete phone value. Pasting local digits replaces the current selection, or inserts at the cursor. Full replacements, pasted values, and explicit international numbers are not truncated; excess digits remain available for correction and fail validation.
 
-```
-Paste: "+44 20 7123 4567" → Country: GB, Value: +442071234567
-Paste: "0044207123456"    → Country: GB, Value: +442071234567
-Paste: "2025551234"       → Stays in current country, formats as national
-```
+Unknown or disallowed international numbers retain their normalized `+…` value and return `invalid_country`. Changing country filters reparses that value rather than silently changing its dial code. Country filters must leave at least one supported country; otherwise mount or `setOptions()` throws a `RangeError` without modifying an existing instance.
+
+Geo-IP can choose the initial country only before initial values, explicit API changes, or user interaction establish a preference.
 
 ## Shared Dial Codes
 
@@ -159,13 +152,13 @@ The library is split into subpath exports. Your bundler only includes what you i
 
 | Import | Contents | Approximate gzipped size |
 |---|---|---|
-| `lite-phone-input` | Core utilities + country data | ~7KB |
-| `lite-phone-input/vanilla` | PhoneInput class + core | ~13KB |
-| `lite-phone-input/react` | React adapter + core | ~14KB |
-| `lite-phone-input/preact` | Preact adapter + core | ~14KB |
-| `lite-phone-input/styles` | CSS stylesheet | ~1KB |
+| `lite-phone-input` | Core utilities + country data | ~7.4KB |
+| `lite-phone-input/vanilla` | PhoneInput class + core | ~12.1KB |
+| `lite-phone-input/react` | React adapter + core | ~17KB |
+| `lite-phone-input/preact` | Preact adapter + core | ~17KB |
+| `lite-phone-input/styles` | CSS stylesheet | ~1.3KB |
 
-The core country data (~240 countries with format masks and validation rules) accounts for the majority of the bundle.
+These are gzip sizes of the built ESM files; bundler minification/tree shaking can reduce them further. The standalone minified browser build is approximately 12.4KB gzipped. Framework peer dependencies are excluded. The core country data accounts for much of the bundle.
 
 ---
 

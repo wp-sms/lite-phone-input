@@ -35,7 +35,7 @@ Pass these to `PhoneInput.mount(el, options)` (vanilla) or as props (React/Preac
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `formatAsYouType` | `boolean` | `true` | Format the input value using the country's mask as the user types |
-| `strict` | `boolean` | `true` | Block non-digit input and enforce max digit length |
+| `strict` | `boolean` | `true` | Block non-digit keys and limit local typing; retain full replacement/paste/international values for validation |
 
 ### Display
 
@@ -122,7 +122,7 @@ Returned by `PhoneInput.mount()`.
 
 ## React / Preact Props
 
-The React and Preact components accept all [Options](#options) as props (minus `inputAttributes`). Unknown props are forwarded as attributes to the underlying `<input>` element.
+The React and Preact components accept all [Options](#options) as props (minus `inputAttributes`). Input attributes, styles, boolean properties, and native DOM event handlers are synchronized on the underlying input. `value` and `defaultValue` are unsupported; use `initialValue` and ref methods.
 
 ```tsx
 import { PhoneInput } from 'lite-phone-input/react';
@@ -255,9 +255,10 @@ interface Country {
   code: string;         // ISO 3166-1 alpha-2 (e.g. 'US')
   name: string;         // English country name
   dialCode: string;     // Dial code without '+' (e.g. '1')
-  format: string;       // Format mask (X = digit, e.g. 'XXX XXX XXXX')
+  format: string | null;       // Format mask (X = digit, e.g. 'XXX XXX XXXX')
   nationalPrefix: string | null;  // National trunk prefix (e.g. '0') or null
   minLength: number;    // Minimum national number digit count
+  possibleLengths?: number[];  // Exact lengths when min/max contains gaps
   maxLength: number;    // Maximum national number digit count
   priority: number;     // Priority for shared dial codes (0 = main)
   displayNationalPrefix: boolean;  // Whether to show national prefix in display (e.g. true for GB)
@@ -280,9 +281,10 @@ interface CountryData {
   c: string;            // ISO code
   n: string;            // English name
   d: string;            // Dial code
-  f: string;            // Format mask
+  f: string | null;            // Format mask
   p: string | null;     // National prefix
   min: number;          // Min digit count
+  l?: number[];        // Exact lengths when min/max contains gaps
   max: number;          // Max digit count
   pri: number;          // Priority
   dp?: number;          // Display national prefix flag (1 = true)
@@ -295,7 +297,7 @@ interface CountryData {
 ```ts
 interface ValidationResult {
   valid: boolean;
-  reason?: 'too_short' | 'too_long';  // Only present when valid is false
+  reason?: 'too_short' | 'too_long' | 'invalid_length' | 'invalid_country';  // Only present when valid is false
   minDigits: number;
   maxDigits: number;
   currentDigits: number;
@@ -338,6 +340,9 @@ interface PhoneInputOptions {
 
 ```ts
 interface PhoneInputRef {
+  focus(): void;
+  reset(): void;
+  getInput(): HTMLInputElement | null;
   getValue(): string;
   getNationalNumber(): string;
   getCountry(): { code: string; dialCode: string; name: string };
@@ -380,3 +385,15 @@ Each subpath provides ESM (`.js`), CJS (`.cjs`), and TypeScript definitions (`.d
 - [React Guide](react-guide.md) — usage, ref methods, form libraries
 - [Styling & Theming](styling.md) — CSS variables and BEM classes
 - [Validation](validation.md) — validation model and error messages
+
+## Input lifecycle and invalid international values
+
+`focus(): void` focuses the visible input. `getInput(): HTMLInputElement` exposes it on the vanilla instance (framework refs may return `null` before mount). `reset(): void` restores the mount-time number and country. Native form resets also synchronize widget state after the browser reset action.
+
+`inputAttributes` can be replaced through vanilla `setOptions()`. Removed attributes are removed from the input. React/Preact synchronize native event listeners, boolean properties, styles, and input attributes from props; `value` and `defaultValue` are unsupported.
+
+`Country.possibleLengths?: number[]` contains the exact possible national lengths when there are gaps between `minLength` and `maxLength`. The raw-data equivalent is `CountryData.l?: number[]`. A format mask may be `null` when the dataset has no mask; formatting then uses the fallback grouping.
+
+`ValidationResult.reason` can also be `invalid_length` (an unsupported length inside the bounds) or `invalid_country` (unknown or disallowed international number). In the latter case, `getValue()` preserves the normalized international string and the UI keeps it visible for correction. Always validate before submission.
+
+Country filters must leave at least one supported country, or mount / `setOptions()` throws `RangeError`. A rejected update leaves the existing instance unchanged. Filter and preferred-country updates refresh an open dropdown; disabling it or setting `allowDropdown: false` closes it.

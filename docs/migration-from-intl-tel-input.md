@@ -2,7 +2,7 @@
 
 # Migration from intl-tel-input
 
-A comprehensive guide for migrating from intl-tel-input (v26) to lite-phone-input.
+A guide for migrating from intl-tel-input v26 to lite-phone-input. Size comparisons are historical v26 estimates, not a benchmark of the latest intl-tel-input release.
 
 ## Table of Contents
 
@@ -47,7 +47,7 @@ lite-phone-input gives you formatting and validation in ~13KB with zero dependen
 | **Country auto-detect (IP)** | Yes (`geoIpLookup`) | Yes (`geoIpLookup`) | Same callback pattern |
 | **Country search** | Yes (`countrySearch: true`) | Yes (always enabled) | — |
 | **Separate dial code** | Yes | Yes | Same option name |
-| **Strict mode** | Yes (`strictMode`) | Yes (`strict`) | Same behavior |
+| **Strict mode** | Yes (`strictMode`) | Yes (`strict`) | lite preserves full replacements/pastes and validates excess digits |
 | **Hidden form inputs** | Yes (function-based) | Yes (object-based) | Different API |
 | **Placeholder** | `autoPlaceholder` + `customPlaceholder` + `placeholderNumberType` | `placeholder: 'auto'` or custom string | intl-tel-input has more control |
 | **Country filtering** | `onlyCountries` / `excludeCountries` | `allowedCountries` / `excludedCountries` | Name difference |
@@ -66,7 +66,7 @@ lite-phone-input gives you formatting and validation in ~13KB with zero dependen
 | **Svelte** | Yes | No | — |
 | **Preact** | No | Yes | lite has native Preact adapter |
 | **CDN/IIFE build** | Yes | Yes | — |
-| **Accessibility** | WCAG 2.1 | WCAG 2.1 AA | Both use combobox pattern |
+| **Accessibility** | See upstream guidance | Named dialog + searchable combobox | Automated checks are not a WCAG certification |
 | **Zero dependencies** | No | Yes | lite is fully self-contained |
 
 ---
@@ -83,7 +83,7 @@ lite-phone-input gives you formatting and validation in ~13KB with zero dependen
 | `allowDropdown` | `allowDropdown` | Same |
 | `separateDialCode` | `separateDialCode` | Same |
 | `formatAsYouType` | `formatAsYouType` | Same |
-| `strictMode` | `strict` | Same behavior, shorter name |
+| `strictMode` | `strict` | Limits local typing; full international/pasted values are preserved |
 | `nationalMode` | `nationalMode` | Same behavior |
 | `containerClass` | `containerClass` | Same |
 | `dropdownContainer` | `dropdownContainer` | Same |
@@ -172,7 +172,7 @@ PhoneInput.mount(el, {
 | `onChangeErrorCode` | — | No error code callback |
 | `usePreciseValidation` | — | No precise validation |
 | `ref.current.getInstance()` | `ref.current` (is the instance) | lite ref IS the imperative handle |
-| `ref.current.getInput()` | — | No direct input element access |
+| `ref.current.getInput()` | `ref.current.getInput()` | Returns the underlying input |
 
 ### Before (intl-tel-input React)
 

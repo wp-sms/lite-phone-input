@@ -72,3 +72,12 @@ describe('validatePhone', () => {
     expect(invalid.currentDigits).toBe(3);
   });
 });
+
+describe('exact possible lengths', () => {
+  it('rejects gaps without rejecting supported lengths', () => {
+    const country = { ...US, minLength: 6, maxLength: 9, possibleLengths: [6, 9] };
+    expect(validatePhone('123456', country).valid).toBe(true);
+    expect(validatePhone('1234567', country)).toMatchObject({ valid: false, reason: 'invalid_length' });
+    expect(validatePhone('123456789', country).valid).toBe(true);
+  });
+});

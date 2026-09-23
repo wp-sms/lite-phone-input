@@ -4,9 +4,9 @@
 
 ## How Validation Works
 
-lite-phone-input uses **length-based validation**. Each country in the dataset has `minLength` and `maxLength` values representing the expected national digit count. Validation compares the current number of digits against these bounds.
+lite-phone-input uses **length-based validation**. Each country in the dataset has `minLength` and `maxLength` values representing the expected national digit count. Validation compares the current number of digits against these bounds and checks exact possible lengths when the range contains gaps.
 
-This approach covers the vast majority of real-world use cases without requiring a full libphonenumber implementation (~260KB).
+This is a plausibility check, not proof that a number is assigned, reachable, or owned by a user. It does not validate prefix patterns or detect mobile versus fixed-line numbers. Keep stricter validation or verification on your server, or opt into an external validator in your application.
 
 ## ValidationResult
 
@@ -15,7 +15,7 @@ Both `validate()` (instance) and `validatePhone()` (utility) return the same sha
 ```ts
 interface ValidationResult {
   valid: boolean;
-  reason?: 'too_short' | 'too_long';  // Only present when valid is false
+  reason?: 'too_short' | 'too_long' | 'invalid_length' | 'invalid_country';  // Only present when valid is false
   minDigits: number;
   maxDigits: number;
   currentDigits: number;
@@ -34,6 +34,13 @@ interface ValidationResult {
 // Too long
 { valid: false, reason: 'too_long', minDigits: 10, maxDigits: 10, currentDigits: 12 }
 ```
+
+## Additional invalid states
+
+- `invalid_length`: the number falls inside min/max bounds but its length is not in the country's `possibleLengths` list.
+- `invalid_country`: an explicit international number has an unknown or disallowed dial code. The original normalized `+…` value stays visible and is returned by `getValue()`; it is never rewritten under the selected country. Correct the number or allow its country before submitting.
+
+`getValue()` returns the current normalized value even when validation fails. Always check validation before treating it as a usable E.164 number.
 
 ## isValid() vs validate()
 
@@ -119,15 +126,17 @@ const result = validatePhone('2025551234', us);
 
 The `digits` parameter should be the **national number** (excluding dial code and national prefix).
 
+Use the validation argument of `onChange` when error details must update while the number remains invalid (for example, `too_short` changing to `invalid_country`).
+
 ## Strict Mode
 
 When `strict: true` (default):
 - Non-digit characters are blocked from being typed
-- The input enforces `maxLength` — digits beyond the country's max are rejected
-- Arabic-Indic and Persian numerals are still accepted (normalized to ASCII)
+- Ordinary local typing is limited to `maxLength`. Full replacements, paste, and explicit international values retain overflow digits and fail validation rather than silently deleting them.
+- All nine supported numeral systems are normalized to ASCII.
 
 When `strict: false`:
-- Any character can be typed
+- Non-digit keys are not blocked, but formatting still extracts digits.
 - No max-length enforcement
 - Validation still works — it just doesn't prevent invalid input
 

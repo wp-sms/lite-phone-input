@@ -295,3 +295,30 @@ describe('React PhoneInput', () => {
     });
   });
 });
+
+
+describe('native input props', () => {
+  it('handles boolean props, events, changing attributes and removals', () => {
+    const onBlur = vi.fn();
+    render(<PhoneInput defaultCountry="US" required={false} onBlur={onBlur} aria-invalid={false} />);
+    const input = container.querySelector('input')!;
+    expect(input.required).toBe(false);
+    input.dispatchEvent(new Event('blur'));
+    expect(onBlur).toHaveBeenCalledOnce();
+    render(<PhoneInput defaultCountry="US" required aria-invalid aria-describedby="error" />);
+    expect(input.required).toBe(true);
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(input.getAttribute('aria-describedby')).toBe('error');
+    render(<PhoneInput defaultCountry="US" />);
+    expect(input.required).toBe(false);
+    expect(input.hasAttribute('aria-describedby')).toBe(false);
+    input.dispatchEvent(new Event('blur'));
+    expect(onBlur).toHaveBeenCalledOnce();
+  });
+  it('restores defaults when an option is removed', () => {
+    render(<PhoneInput defaultCountry="US" disabled />);
+    const input = container.querySelector('input')!;
+    render(<PhoneInput defaultCountry="US" />);
+    expect(input.disabled).toBe(false);
+  });
+});

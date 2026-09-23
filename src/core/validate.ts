@@ -31,6 +31,10 @@ export function validatePhone(
     };
   }
 
+  if (country.possibleLengths && !country.possibleLengths.includes(currentDigits)) {
+    return { valid: false, reason: 'invalid_length', minDigits: minLength, maxDigits: maxLength, currentDigits };
+  }
+
   return {
     valid: true,
     minDigits: minLength,

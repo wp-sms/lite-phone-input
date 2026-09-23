@@ -2,7 +2,7 @@
 
 # Accessibility
 
-lite-phone-input targets **WCAG 2.1 AA** compliance. This page documents the ARIA patterns, keyboard interactions, and screen reader behavior built into the widget.
+lite-phone-input targets **WCAG 2.1 AA** accessibility and runs automated axe checks in desktop and mobile browser tests. Automated checks are not a certification; screen-reader verification is still needed for your complete form. This page documents the ARIA patterns, keyboard interactions, and screen reader behavior built into the widget.
 
 ## ARIA Roles and Attributes
 
@@ -12,10 +12,10 @@ When `allowDropdown: true` (default), the trigger is a `<button>` with:
 
 | Attribute | Value | Description |
 |---|---|---|
-| `role` | `combobox` | Indicates a composite widget with a popup |
 | `aria-expanded` | `true` / `false` | Reflects dropdown open/closed state |
-| `aria-haspopup` | `listbox` | Indicates the popup contains a listbox |
-| `aria-label` | `"Select country"` | Accessible name for the button |
+| `aria-haspopup` | `dialog` | Announces the country selector dialog |
+| `aria-controls` | Dialog ID while open | Links the trigger to its popup |
+| `aria-label` | Country name and dial code | Announces the current selection |
 | `type` | `button` | Prevents form submission on click |
 
 When `allowDropdown: false`, the trigger is a `<span>` (not interactive).
@@ -27,6 +27,7 @@ When `allowDropdown: false`, the trigger is a `<span>` (not interactive).
 | Dropdown container | `role` | `dialog` |
 | Dropdown container | `aria-label` | `"Select country"` |
 | Search input | `role` | `combobox` |
+| Search input | `aria-label` | `"Search countries"` |
 | Search input | `aria-expanded` | `true` |
 | Search input | `aria-controls` | `lpi-list-{id}` (references the listbox) |
 | Search input | `aria-autocomplete` | `list` |
@@ -66,7 +67,7 @@ A visually hidden `<div>` with `aria-live="polite"` announces the result count w
 | **Arrow Up** | Move highlight to previous country (wraps to bottom) |
 | **Enter** | Select the highlighted country and close |
 | **Escape** | Close the dropdown, return focus to trigger |
-| **Tab** | Close the dropdown |
+| **Tab / Shift+Tab** | Move between search and Close; leaving the dialog restores normal tab order |
 | **Any letter** | Types into the search input (auto-focused on open) |
 
 ### Trigger Button
@@ -80,13 +81,14 @@ A visually hidden `<div>` with `aria-live="polite"` announces the result count w
 1. **Dropdown opens**: focus moves to the search input inside the dropdown
 2. **Country selected** (Enter or click): dropdown closes, focus moves to the phone input
 3. **Escape pressed**: dropdown closes, focus returns to the trigger button
-4. **Click outside**: dropdown closes
+4. **Click outside**: dropdown closes without stealing focus from the clicked control
+5. **Close button**: closes the dialog and returns focus to the trigger; available on desktop and mobile
 
 The currently selected country is highlighted when the dropdown opens, and the list scrolls to show it.
 
 ## Screen Reader Behavior
 
-- The trigger button announces "Select country" via `aria-label`
+- The trigger button announces the selected country and dial code via `aria-label`
 - When the dropdown opens, the search input is focused and announced as a combobox
 - As the user arrows through countries, `aria-activedescendant` updates to announce each option
 - The live region announces result counts as the user types in search (e.g., "5 results")

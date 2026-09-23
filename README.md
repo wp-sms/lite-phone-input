@@ -4,9 +4,11 @@
 [![bundle size](https://img.shields.io/bundlephobia/minzip/lite-phone-input)](https://bundlephobia.com/package/lite-phone-input)
 [![license](https://img.shields.io/npm/l/lite-phone-input.svg)](./LICENSE)
 
-Lightweight phone input with format-as-you-type, validation, and emoji flags. **~13KB gzipped total** — zero runtime dependencies.
+Lightweight phone input with format-as-you-type, validation, and emoji flags. **~13KB gzipped JavaScript plus ~1KB CSS** — zero runtime dependencies.
 
 ## Why lite-phone-input?
+
+The comparison below describes the original v26 migration baseline; third-party sizes vary by version and build. See the [migration guide](docs/migration-from-intl-tel-input.md) for capability differences.
 
 | | lite-phone-input | intl-tel-input |
 |---|---|---|
@@ -14,7 +16,7 @@ Lightweight phone input with format-as-you-type, validation, and emoji flags. **
 | **Flag assets** | Emoji (0KB) | Webp sprites (30–66KB) |
 | **Dependencies** | 0 | Flag sprites + optional utils |
 | **Formatting** | Built-in | Requires utils bundle |
-| **Validation** | Built-in | Requires utils bundle |
+| **Validation** | Built-in length plausibility | Full numbering rules via utils |
 
 ## Features
 
@@ -24,8 +26,14 @@ Lightweight phone input with format-as-you-type, validation, and emoji flags. **
 - **Per-country length validation** with rich error data
 - **TypeScript-first** with full type definitions
 - **Framework adapters** — Vanilla JS, React, Preact
-- **Accessible** — WCAG 2.1 AA, ARIA combobox pattern, keyboard navigation
+- **Accessible interactions** — named country dialog, searchable combobox, keyboard navigation, and automated WCAG checks
 - **SSR-safe** — no browser API calls at module level
+
+Validation checks plausible number lengths, including country-specific gaps. It does not verify assigned prefixes, number type, ownership, or reachability. Use server-side validation or verification when those guarantees are needed.
+
+## Upgrading to 0.6
+
+See the [0.6.0 upgrade notes](CHANGELOG.md#060---2026-09-23) for new validation reasons, preserved international values, and framework event types. Updated [form-library recipes](docs/form-integration.md) cover reset, blur, and programmatic changes.
 
 ## Installation
 
@@ -83,7 +91,7 @@ import { PhoneInput } from 'lite-phone-input/preact';
 import 'lite-phone-input/styles';
 ```
 
-Same API as React. Uses `preact/hooks` directly — no `preact/compat` required.
+Same API as React. Uses native Preact hooks and `preact/compat` for `forwardRef`; no React aliasing is required.
 
 ### CDN / Script Tag
 
@@ -99,7 +107,7 @@ Same API as React. Uses `preact/hooks` directly — no `preact/compat` required.
 
 ## Geo IP Lookup
 
-Auto-detect the user's country at mount time using any geo-IP service. The lookup runs once, and the result is ignored if the user has already interacted with the widget.
+Auto-detect the user's country at mount time using any geo-IP service. The lookup runs once, and its result is ignored when an initial value, explicit `setValue()` / `setCountry()` call, or user interaction has already established the input state.
 
 ```js
 const phone = PhoneInput.mount(document.getElementById('phone'), {
@@ -146,7 +154,7 @@ geoIpLookup: (callback) => {
 
 ## Browser Support
 
-Chrome 80+, Firefox 80+, Safari 14+, Edge 80+. No IE support, no polyfills needed.
+Browser integration tests cover current Chromium, Firefox, WebKit, and mobile WebKit emulation. Requires modern DOM APIs including abortable event listeners. No IE support.
 
 ## Contributing
 

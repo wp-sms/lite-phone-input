@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2026-09-23
+
+### Upgrade notes
+
+- Validation can now return `invalid_country` and `invalid_length`. Update exhaustive reason handling and validate before submitting `getValue()`.
+- Full international, pasted, and replacement values retain overflow digits instead of being silently truncated. Ordinary local typing still respects strict mode.
+- React/Preact input events such as `onBlur` receive native DOM events. React handlers should not assume SyntheticEvent methods. `onChange` retains its `(value, country, validation)` signature.
+- Framework `value` and `defaultValue` props are excluded from the public type. Use `initialValue` for mount-time values and `ref.setValue()` for subsequent changes; see the updated form-library recipes.
+- Country filters that leave no supported country now throw a descriptive `RangeError`.
+
+### Added
+
+- `focus()`, `reset()`, and `getInput()` on vanilla instances and framework refs.
+- `Country.possibleLengths` for exact possible lengths when a country's min/max range has gaps.
+
+### Fixed
+
+- Preserve international replacements in national/separate-dial-code modes; unknown or disallowed countries report `invalid_country` without rewriting the value (issue #2).
+- Ignore late geo-IP results after initial values, explicit API changes, or user interaction.
+- Honor local paste selections and synchronize native form resets with widget state and hidden fields.
+- Synchronize React/Preact boolean props, event handlers, styles, and changing/removed input attributes.
+- Support dropdown interactions inside closed ShadowRoots (issue #1), update open dropdown filters, and close disabled dropdowns.
+- Reject country filters that leave no supported country without partially applying updates.
+- Add a named dialog relationship, accessible search label, visible Close button, and clear stale active-descendant references.
+- Preserve the React client boundary and support React 17 ESM imports without relying on JSX runtime resolution.
+
+### Changed
+
+- International and pasted/replacement values retain overflow digits for validation instead of silently truncating them. Ordinary local typing still respects strict mode.
+- Pin libphonenumber metadata and preserve exact possible lengths where the range has gaps (`invalid_length`). Validation remains a plausibility check.
+- Minify the vanilla/browser builds and enforce a gzip bundle budget.
+- Add browser/axe, package-consumer and coverage checks; update development dependencies.
+
 ## [0.5.0] - 2026-03-30
 
 ### Fixed
@@ -76,6 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TypeScript-first** — written in TypeScript with full type definitions
 - **Zero runtime dependencies**
 
+[0.6.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.2.0...v0.3.0

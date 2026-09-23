@@ -11,9 +11,12 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { gzipSync } from 'node:zlib';
+import { createHash } from 'node:crypto';
+import { pathToFileURL } from 'node:url';
 
-const METADATA_URL =
-  'https://raw.githubusercontent.com/google/libphonenumber/master/resources/PhoneNumberMetadata.xml';
+const METADATA_REVISION = 'd347e5d04397c99fe018636eac2f363a27af71c2';
+const METADATA_URL = `https://raw.githubusercontent.com/google/libphonenumber/${METADATA_REVISION}/resources/PhoneNumberMetadata.xml`;
+const SOURCE_PATH = new URL('../data/metadata-source.json', import.meta.url);
 
 const OUTPUT_PATH = new URL('../data/phone-countries.json', import.meta.url);
 
@@ -50,7 +53,7 @@ async function downloadMetadata() {
  * Parse possibleLengths national attribute.
  * Formats: "10", "7,8,10", "[4-8],10,12"
  */
-function parseLengths(national) {
+export function parseLengths(national) {
   if (!national) return [];
   const lengths = [];
   for (const part of national.split(',')) {
@@ -305,7 +308,7 @@ function assignPriorities(entries, mainCountryCodes) {
 
 // --- Verification ---
 
-function verify(data, jsonStr) {
+export function verify(data, jsonStr) {
   const issues = [];
 
   console.log(`\nTotal countries: ${data.length}`);
@@ -341,6 +344,12 @@ function verify(data, jsonStr) {
     if (entry.min > entry.max) {
       issues.push(`${entry.c}: min (${entry.min}) > max (${entry.max})`);
     }
+    if (entry.l && (entry.l[0] !== entry.min || entry.l.at(-1) !== entry.max || entry.l.some((n, i) => !Number.isInteger(n) || n < 1 || (i > 0 && n <= entry.l[i - 1])))) {
+      issues.push(`${entry.c}: invalid possible lengths`);
+    }
+    if (entry.ex && (entry.ex.length < entry.min || entry.ex.length > entry.max || (entry.l && !entry.l.includes(entry.ex.length)))) {
+      issues.push(`${entry.c}: example does not match possible lengths`);
+    }
     if (entry.f && !/^[X \-]+$/.test(entry.f)) {
       issues.push(`${entry.c}: invalid format mask chars: "${entry.f}"`);
     }
@@ -352,6 +361,7 @@ function verify(data, jsonStr) {
   if (issues.length > 0) {
     console.log('\nVerification issues:');
     for (const issue of issues) console.log(`  ⚠ ${issue}`);
+    throw new Error(`Country data verification failed: ${issues.length} issue(s)`);
   } else {
     console.log('Verification: all checks passed.');
   }
@@ -422,6 +432,7 @@ async function main() {
       warnings.push(`${t.id}: no length data, using fallback 4-15`);
     }
 
+    const lengths = [...new Set(t.lengths)].sort((a, b) => a - b);
     entries.push({
       c: t.id,
       n: name,
@@ -430,6 +441,7 @@ async function main() {
       p: t.nationalPrefix,
       min,
       max,
+      ...(lengths.length && lengths.length !== max - min + 1 ? { l: lengths } : {}),
       pri: 0,
       ...(displayPrefix ? { dp: displayPrefix } : {}),
       ...(exampleNumber ? { ex: exampleNumber } : {}),
@@ -440,18 +452,31 @@ async function main() {
   entries.sort((a, b) => a.n.localeCompare(b.n, 'en'));
 
   const json = JSON.stringify(entries, null, 2);
-  writeFileSync(OUTPUT_PATH, json + '\n', 'utf-8');
-  console.log(`\nWrote ${OUTPUT_PATH.pathname}`);
+  // Validate before writing so a bad upstream snapshot cannot overwrite good data.
+  verify(entries, json);
+  const source = JSON.stringify({
+    url: process.argv.includes('--local') ? null : METADATA_URL,
+    revision: process.argv.includes('--local') ? null : METADATA_REVISION,
+    sha256: createHash('sha256').update(xml).digest('hex'),
+  }, null, 2) + '\n';
+  if (process.argv.includes('--check')) {
+    if (readFileSync(OUTPUT_PATH, 'utf8') !== json + '\n' || readFileSync(SOURCE_PATH, 'utf8') !== source) {
+      throw new Error('Generated metadata differs. Run npm run generate-data with Node 24 and review the diff.');
+    }
+  } else {
+    writeFileSync(OUTPUT_PATH, json + '\n', 'utf-8');
+    writeFileSync(SOURCE_PATH, source, 'utf-8');
+    console.log(`\nWrote ${OUTPUT_PATH.pathname}`);
+  }
 
   if (warnings.length > 0) {
     console.log('\nWarnings:');
     for (const w of warnings) console.log(`  ⚠ ${w}`);
   }
 
-  verify(entries, json);
 }
 
-main().catch((err) => {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main().catch((err) => {
   console.error(err);
   process.exit(1);
 });

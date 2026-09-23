@@ -159,3 +159,5 @@ function App() {
 - [React Guide](react-guide.md) — if you're using React instead
 - [Styling & Theming](styling.md) — CSS customization
 - [Form Integration](form-integration.md) — hidden inputs and form libraries
+
+The adapter uses `preact/compat` only for `forwardRef`; it is provided by the Preact peer dependency. Input event props receive native DOM events. See [Form Integration](form-integration.md) for reset and programmatic-value bridges.

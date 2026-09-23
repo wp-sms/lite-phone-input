@@ -8,7 +8,7 @@ export interface DropdownOptions {
   locale?: string;
   renderFlag?: (countryCode: string) => string;
   onSelect: (country: Country) => void;
-  onClose: () => void;
+  onClose: (restoreFocus?: boolean) => void;
   container: HTMLElement;
 }
 
@@ -27,6 +27,8 @@ export class Dropdown {
   private ac: AbortController | null = null;
   private displayNames: Intl.DisplayNames | null = null;
   private options: DropdownOptions;
+
+  get dialogId(): string { return `lpi-dialog-${this.id}`; }
 
   constructor(options: DropdownOptions) {
     this.options = options;
@@ -49,8 +51,17 @@ export class Dropdown {
     // Build dropdown DOM
     this.el = document.createElement('div');
     this.el.className = 'lpi__dropdown';
+    this.el.id = this.dialogId;
     this.el.setAttribute('role', 'dialog');
     this.el.setAttribute('aria-label', 'Select country');
+
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'lpi__close';
+    close.setAttribute('aria-label', 'Close country selector');
+    close.textContent = 'Close';
+    close.addEventListener('click', () => this.options.onClose(true), { signal });
+    this.el.appendChild(close);
 
     // Search input
     this.searchInput = document.createElement('input');
@@ -61,6 +72,7 @@ export class Dropdown {
     this.searchInput.setAttribute('aria-controls', `lpi-list-${this.id}`);
     this.searchInput.setAttribute('aria-autocomplete', 'list');
     this.searchInput.placeholder = 'Search...';
+    this.searchInput.setAttribute('aria-label', 'Search countries');
     this.el.appendChild(this.searchInput);
 
     // Live region
@@ -73,6 +85,7 @@ export class Dropdown {
     this.listEl = document.createElement('ul');
     this.listEl.className = 'lpi__list';
     this.listEl.setAttribute('role', 'listbox');
+    this.listEl.setAttribute('aria-label', 'Countries');
     this.listEl.id = `lpi-list-${this.id}`;
     this.el.appendChild(this.listEl);
 
@@ -108,7 +121,30 @@ export class Dropdown {
     this.listEl.addEventListener('click', (e) => this.handleListClick(e), { signal });
 
     // Close triggers
-    document.addEventListener('mousedown', (e) => this.handleClickOutside(e), { signal });
+    // Bubble through each event root before document: closed roots hide their
+    // internals from outer composedPath() calls. Remember inside events there.
+    const inside = new WeakSet<Event>();
+    const roots = new Set<Document | ShadowRoot>();
+    for (const element of [this.el, anchorEl]) {
+      let root = element.getRootNode();
+      while (root instanceof ShadowRoot) {
+        roots.add(root);
+        root = root.host.getRootNode();
+      }
+      roots.add(element.ownerDocument);
+    }
+    const outside = (event: Event) => {
+      if (inside.has(event)) return;
+      const path = event.composedPath();
+      if ((this.el && path.includes(this.el)) || path.includes(anchorEl)) inside.add(event);
+      else this.options.onClose(false);
+    };
+    for (const root of roots) {
+      root.addEventListener('mousedown', outside, { signal });
+      root.addEventListener('touchstart', outside, { signal, passive: true });
+    }
+    window.addEventListener('resize', () => this.options.onClose(false), { signal });
+    window.addEventListener('scroll', () => this.options.onClose(false), { signal, passive: true });
     this.setupScrollListeners(anchorEl, signal);
   }
 
@@ -155,9 +191,25 @@ export class Dropdown {
   }
 
   updateCountries(countries: Country[], preferredCountries: string[]): void {
-    this.options.countries = countries;
-    this.options.preferredCountries = preferredCountries;
+    this.updateOptions({ countries, preferredCountries });
+  }
+
+  updateOptions(options: Partial<Pick<DropdownOptions, 'countries' | 'preferredCountries' | 'locale' | 'renderFlag'>>): void {
+    Object.assign(this.options, options);
     this.orderedCountries = null;
+    this.displayNames = null;
+    if (this.options.locale && typeof Intl.DisplayNames === 'function') {
+      try { this.displayNames = new Intl.DisplayNames([this.options.locale], { type: 'region' }); } catch { /* English fallback */ }
+    }
+    if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    this.searchTimeout = null;
+    if (this.el) {
+      this.filteredItems = this.search(this.searchInput?.value ?? '');
+      this.highlightIndex = -1;
+      this.buildList();
+      const selected = this.filteredItems.findIndex(c => c.code === this.options.selectedCode);
+      if (this.filteredItems.length) this.updateHighlight(Math.max(0, selected));
+    }
   }
 
   destroy(): void {
@@ -188,7 +240,8 @@ export class Dropdown {
     }
 
     preferred.sort((a, b) => {
-      return preferredCountries.indexOf(a.code) - preferredCountries.indexOf(b.code);
+      const codes = preferredCountries.map(code => code.toUpperCase());
+      return codes.indexOf(a.code) - codes.indexOf(b.code);
     });
 
     this.orderedCountries = [...preferred, ...rest];
@@ -198,6 +251,7 @@ export class Dropdown {
   private buildList(): void {
     if (!this.listEl) return;
     this.listEl.replaceChildren();
+    this.searchInput?.removeAttribute('aria-activedescendant');
 
     const { preferredCountries, selectedCode } = this.options;
     const prefSet = preferredCountries.length > 0
@@ -305,6 +359,7 @@ export class Dropdown {
   }
 
   private handleKeyDown(e: KeyboardEvent): void {
+    if (e.target instanceof HTMLButtonElement && e.key !== 'Escape' && e.key !== 'Tab') return;
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
@@ -338,9 +393,13 @@ export class Dropdown {
         this.options.onClose();
         break;
 
-      case 'Tab':
-        this.options.onClose();
+      case 'Tab': {
+        const onSearch = e.target === this.searchInput;
+        // Keep the close button keyboard-accessible. At either end, restore the
+        // trigger before the browser performs its normal forward/backward Tab.
+        if ((onSearch && !e.shiftKey) || (!onSearch && e.shiftKey)) this.options.onClose(true);
         break;
+      }
     }
   }
 
@@ -351,12 +410,6 @@ export class Dropdown {
     if (country) this.options.onSelect(country);
   }
 
-  private handleClickOutside(e: MouseEvent): void {
-    if (this.el && !e.composedPath().includes(this.el)) {
-      this.options.onClose();
-    }
-  }
-
   private setupScrollListeners(anchorEl: HTMLElement, signal: AbortSignal): void {
     let node: HTMLElement | null = anchorEl.parentElement;
     while (node && node !== document.documentElement) {
@@ -364,7 +417,7 @@ export class Dropdown {
       ancestor.addEventListener('scroll', () => {
         // Don't close if the scroll is from the dropdown itself
         if (this.el && this.el.contains(ancestor)) return;
-        this.options.onClose();
+        this.options.onClose(false);
       }, { signal, passive: true });
       node = node.parentElement;
     }

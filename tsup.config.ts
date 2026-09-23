@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup';
+import { copyFile } from 'node:fs/promises';
 
 export default defineConfig([
   // Core utilities (headless/server use)
@@ -14,12 +15,13 @@ export default defineConfig([
   {
     entry: ['src/vanilla/index.ts'],
     format: ['esm', 'cjs', 'iife'],
+    minify: true,
     dts: true,
     outDir: 'dist/vanilla',
     clean: true,
     sourcemap: true,
     globalName: 'LitePhoneInput',
-    onSuccess: 'cp src/vanilla/styles.css dist/styles.css',
+    onSuccess: async () => { await copyFile('src/vanilla/styles.css', 'dist/styles.css'); },
   },
   // React adapter
   {
@@ -30,6 +32,7 @@ export default defineConfig([
     clean: true,
     sourcemap: true,
     external: ['react', 'react-dom'],
+    banner: { js: '"use client";' },
     jsx: 'automatic',
   },
   // Preact adapter

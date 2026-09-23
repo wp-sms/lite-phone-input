@@ -21,6 +21,7 @@ export function processCountryData(raw: CountryData[]): Country[] {
     nationalPrefix: d.p,
     minLength: d.min,
     maxLength: d.max,
+    ...(d.l ? { possibleLengths: d.l } : {}),
     priority: d.pri,
     displayNationalPrefix: !!d.dp,
     exampleNumber: d.ex ?? null,

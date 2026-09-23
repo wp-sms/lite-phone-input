@@ -1,8 +1,12 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, type InputHTMLAttributes } from 'react';
+import { createElement, forwardRef, useEffect, useImperativeHandle, useRef, type InputHTMLAttributes } from 'react';
+import { dynamicOptionKeys, syncInputProps, type NativeInputAttributes } from '../adapters/props';
 import type { PhoneInputOptions, ValidationResult } from '../core/types';
 import { PhoneInput as VanillaPhoneInput } from '../vanilla/phone-input';
 
 export interface PhoneInputRef {
+  focus(): void;
+  reset(): void;
+  getInput(): HTMLInputElement | null;
   getValue(): string;
   getNationalNumber(): string;
   getCountry(): { code: string; dialCode: string; name: string };
@@ -14,40 +18,16 @@ export interface PhoneInputRef {
 
 type WidgetProps = Omit<PhoneInputOptions, 'inputAttributes'>;
 
-/** Keys that belong to the widget, not to the underlying <input> element */
-const WIDGET_KEYS = new Set<string>([
-  'defaultCountry', 'allowedCountries', 'excludedCountries', 'preferredCountries',
-  'allowDropdown', 'formatAsYouType', 'strict', 'separateDialCode', 'nationalMode',
-  'placeholder', 'disabled', 'locale', 'renderFlag', 'hiddenInput',
-  'initialValue', 'containerClass', 'dropdownContainer', 'geoIpLookup',
-  'onChange', 'onCountryChange', 'onValidationChange', 'onDropdownOpen', 'onDropdownClose',
-]);
-
-type InputAttrs = Omit<InputHTMLAttributes<HTMLInputElement>, keyof WidgetProps>;
+type InputAttrs = Omit<NativeInputAttributes<InputHTMLAttributes<HTMLInputElement>>, keyof WidgetProps | 'value' | 'defaultValue' | 'children'>;
 
 export type PhoneInputProps = WidgetProps & InputAttrs;
-
-const DYNAMIC_OPTION_KEYS: (keyof WidgetProps)[] = [
-  'disabled', 'allowedCountries', 'excludedCountries', 'preferredCountries',
-  'allowDropdown', 'formatAsYouType', 'strict', 'separateDialCode', 'nationalMode',
-  'placeholder', 'locale', 'renderFlag',
-];
-
-function extractInputAttrs(props: PhoneInputProps): Record<string, string> {
-  const attrs: Record<string, string> = {};
-  for (const [key, val] of Object.entries(props)) {
-    if (!WIDGET_KEYS.has(key) && key !== 'className' && val !== undefined) {
-      attrs[key] = String(val);
-    }
-  }
-  return attrs;
-}
 
 export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
   function PhoneInput(props, ref) {
     const containerRef = useRef<HTMLDivElement>(null);
     const instanceRef = useRef<VanillaPhoneInput | null>(null);
     const propsRef = useRef(props);
+    const prevInputPropsRef = useRef<Record<string, unknown>>({});
     const prevOptsRef = useRef<Record<string, unknown>>({});
     propsRef.current = props;
 
@@ -55,7 +35,6 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
       if (!containerRef.current) return;
 
       const p = propsRef.current;
-      const inputAttributes = extractInputAttrs(p);
 
       const options: PhoneInputOptions = {
         defaultCountry: p.defaultCountry,
@@ -76,7 +55,6 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
         dropdownContainer: p.dropdownContainer,
         geoIpLookup: p.geoIpLookup,
         initialValue: p.initialValue,
-        inputAttributes,
         // Callbacks read from ref so they always use the latest version
         onChange: (e164, country, validation) =>
           propsRef.current.onChange?.(e164, country, validation),
@@ -89,8 +67,12 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
       };
 
       instanceRef.current = VanillaPhoneInput.mount(containerRef.current, options);
+      prevOptsRef.current = Object.fromEntries(dynamicOptionKeys.map(key => [key, p[key]]));
+      prevInputPropsRef.current = syncInputProps(instanceRef.current.getInput(), p as unknown as Record<string, unknown>, {});
 
       return () => {
+        if (instanceRef.current) syncInputProps(instanceRef.current.getInput(), {}, prevInputPropsRef.current);
+        prevInputPropsRef.current = {};
         instanceRef.current?.destroy();
         instanceRef.current = null;
       };
@@ -107,8 +89,8 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
       const opts: Partial<PhoneInputOptions> = {};
       let hasChanges = false;
 
-      for (const key of DYNAMIC_OPTION_KEYS) {
-        if (props[key] !== undefined && props[key] !== prevOptsRef.current[key]) {
+      for (const key of dynamicOptionKeys) {
+        if (props[key] !== prevOptsRef.current[key]) {
           (opts as Record<string, unknown>)[key] = props[key];
           hasChanges = true;
         }
@@ -116,13 +98,12 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
 
       // Track current values for next comparison
       const currentOpts: Record<string, unknown> = {};
-      for (const key of DYNAMIC_OPTION_KEYS) {
+      for (const key of dynamicOptionKeys) {
         currentOpts[key] = props[key];
       }
       prevOptsRef.current = currentOpts;
 
-      // Always sync input attributes (cheap to set, hard to diff)
-      opts.inputAttributes = extractInputAttrs(props);
+      prevInputPropsRef.current = syncInputProps(instance.getInput(), props as unknown as Record<string, unknown>, prevInputPropsRef.current);
 
       if (hasChanges) {
         instance.setOptions(opts);
@@ -130,6 +111,9 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
     });
 
     useImperativeHandle(ref, () => ({
+      focus: () => instanceRef.current?.focus(),
+      reset: () => instanceRef.current?.reset(),
+      getInput: () => instanceRef.current?.getInput() ?? null,
       getValue: () => instanceRef.current?.getValue() ?? '',
       getNationalNumber: () => instanceRef.current?.getNationalNumber() ?? '',
       getCountry: () =>
@@ -146,6 +130,6 @@ export const PhoneInput = forwardRef<PhoneInputRef, PhoneInputProps>(
         },
     }));
 
-    return <div ref={containerRef} className={props.className} />;
+    return createElement('div', { ref: containerRef, className: props.className });
   },
 );

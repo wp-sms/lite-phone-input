@@ -1,6 +1,6 @@
 {
   "name": "lite-phone-input",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Lightweight phone input with formatting, validation, and emoji flags — ~13KB gzipped",
   "license": "MIT",
   "type": "module",
@@ -44,7 +44,10 @@
     "typecheck": "tsc --noEmit",
     "generate-data": "node scripts/generate-data.mjs",
     "example": "npm run build && open examples/vanilla.html",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test:browser": "npm run build && playwright test",
+    "test:package": "npm run build && node scripts/check-package.mjs",
+    "check:data": "node scripts/generate-data.mjs --check"
   },
   "peerDependencies": {
     "preact": ">=10",
@@ -59,9 +62,13 @@
     }
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.1.11",
+    "esbuild": "^0.28.2",
     "jsdom": "^29.0.1",
     "preact": "^10.29.0",
     "react": "^19.2.4",
@@ -89,5 +96,8 @@
   },
   "sideEffects": [
     "*.css"
-  ]
+  ],
+  "overrides": {
+    "esbuild": "$esbuild"
+  }
 }

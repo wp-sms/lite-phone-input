@@ -2,203 +2,131 @@
 
 # Form Integration
 
-## Hidden Inputs
+The widget owns its editing state. `initialValue` is read once; use `setValue()` when a form library resets, loads, or changes a value. `setValue()` does not emit `onChange` when the normalized value is unchanged, so a form bridge can safely synchronize values.
 
-For traditional HTML form submissions, use `hiddenInput` to create hidden `<input>` elements that are automatically kept in sync:
+## Native HTML forms
+
+Use hidden fields to submit the normalized value and country:
 
 ```js
-PhoneInput.mount(el, {
+const phone = PhoneInput.mount(document.getElementById('phone'), {
   defaultCountry: 'US',
-  hiddenInput: {
-    phone: 'phone_e164',       // <input type="hidden" name="phone_e164" value="+12025551234">
-    country: 'phone_country',  // <input type="hidden" name="phone_country" value="US">
-  },
+  initialValue: '+12025551234',
+  hiddenInput: { phone: 'phone', country: 'phone_country' },
+  inputAttributes: { id: 'phone-input', required: 'true' },
+});
+
+const form = document.getElementById('contact-form');
+form.addEventListener('submit', event => {
+  if (!phone.isValid()) {
+    event.preventDefault();
+    phone.focus();
+    // Show a labeled error using phone.validate().reason.
+  }
 });
 ```
 
-Both fields are optional — include only what you need:
+Give the visible input an associated `<label>`. Its native `required` attribute checks emptiness, not phone plausibility. Validate before submitting hidden fields. If you also name the visible input, use a different name; its value is formatted for display.
 
-```js
-// Only the E.164 value
-hiddenInput: { phone: 'phone' }
-
-// Only the country code
-hiddenInput: { country: 'country_code' }
-```
-
-## Vanilla Form Submission
-
-```html
-<form id="contact-form">
-  <div id="phone"></div>
-  <button type="submit">Submit</button>
-</form>
-
-<script type="module">
-  import { PhoneInput } from 'lite-phone-input/vanilla';
-  import 'lite-phone-input/styles';
-
-  const phone = PhoneInput.mount(document.getElementById('phone'), {
-    defaultCountry: 'US',
-    hiddenInput: { phone: 'phone', country: 'country' },
-  });
-
-  document.getElementById('contact-form').addEventListener('submit', (e) => {
-    if (!phone.isValid()) {
-      e.preventDefault();
-      alert('Please enter a valid phone number');
-      return;
-    }
-    // Hidden inputs are already populated — form submits normally
-  });
-</script>
-```
+`form.reset()` restores the initial phone value and country, display, and hidden fields after the browser's reset action. Canceled reset events are respected. `phone.reset()` performs the same restoration immediately. Native reset handling follows the input's form association, including a later `form` attribute update. A newer programmatic value supplied during or immediately after reset takes precedence.
 
 ## React Hook Form
 
+This bridge handles ordinary edits, blur/touched state, `reset()`, `setValue()`, and focus on validation errors. The adapter emits native DOM events for `onBlur` and other input event props.
+
 ```tsx
-import { useForm, Controller } from 'react-hook-form';
-import { PhoneInput } from 'lite-phone-input/react';
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { Controller, useForm, type ControllerRenderProps } from 'react-hook-form';
+import { PhoneInput, type PhoneInputRef } from 'lite-phone-input/react';
 import 'lite-phone-input/styles';
 
-interface FormValues {
-  phone: string;
-}
+type Values = { phone: string };
 
-function PhoneForm() {
-  const { control, handleSubmit, formState: { errors } } = useForm<FormValues>();
+function PhoneField({ field }: { field: ControllerRenderProps<Values, 'phone'> }) {
+  const phone = useRef<PhoneInputRef | null>(null);
+  useEffect(() => { phone.current?.setValue(field.value ?? ''); }, [field.value]);
 
   return (
-    <form onSubmit={handleSubmit((data) => console.log(data.phone))}>
-      <Controller
-        name="phone"
-        control={control}
-        rules={{
-          required: 'Phone number is required',
-          validate: (value) => value.length > 3 || 'Enter a valid phone number',
-        }}
-        render={({ field }) => (
-          <PhoneInput
-            defaultCountry="US"
-            separateDialCode
-            initialValue={field.value}
-            onChange={(e164) => field.onChange(e164)}
-            name={field.name}
-          />
-        )}
-      />
-      {errors.phone && <p>{errors.phone.message}</p>}
+    <PhoneInput
+      ref={instance => { phone.current = instance; field.ref(instance); }}
+      defaultCountry="US"
+      initialValue={field.value}
+      name={field.name}
+      aria-label="Phone number"
+      onChange={value => field.onChange(value)}
+      onBlur={field.onBlur}
+    />
+  );
+}
+
+export function PhoneForm() {
+  const { control, handleSubmit, reset } = useForm<Values>({
+    defaultValues: { phone: '+12025551234' },
+  });
+  return (
+    <form onSubmit={handleSubmit(values => console.log(values.phone))}>
+      <Controller name="phone" control={control}
+        rules={{ required: 'Phone number is required' }}
+        render={({ field }) => <PhoneField field={field} />} />
+      <button type="button" onClick={() => reset({ phone: '' })}>Clear</button>
       <button type="submit">Submit</button>
     </form>
   );
 }
 ```
 
+The example enforces presence only. Use your form schema or server validator for phone plausibility, or wire `PhoneInput.validate()` into your validation rule. Length validation does not prove number ownership or reachability.
+
 ## Formik
 
+Keep a ref bridge for programmatic updates and explicitly report blur so touched state works:
+
 ```tsx
-import { Formik, Form } from 'formik';
-import { PhoneInput } from 'lite-phone-input/react';
+'use client';
+
+import { useEffect, useRef } from 'react';
+import { Formik, Form, useField } from 'formik';
+import { PhoneInput, type PhoneInputRef } from 'lite-phone-input/react';
 import 'lite-phone-input/styles';
 
-function PhoneForm() {
+function PhoneField() {
+  const [field, meta, helpers] = useField<string>('phone');
+  const phone = useRef<PhoneInputRef>(null);
+  useEffect(() => { phone.current?.setValue(field.value ?? ''); }, [field.value]);
+  const error = meta.touched ? meta.error : undefined;
   return (
-    <Formik
-      initialValues={{ phone: '' }}
-      validate={(values) => {
-        const errors: Record<string, string> = {};
-        if (!values.phone || values.phone.length <= 3) {
-          errors.phone = 'Valid phone number required';
-        }
-        return errors;
-      }}
-      onSubmit={(values) => console.log(values.phone)}
-    >
-      {({ setFieldValue, values, errors, touched }) => (
-        <Form>
-          <PhoneInput
-            defaultCountry="US"
-            initialValue={values.phone}
-            onChange={(e164) => setFieldValue('phone', e164)}
-            name="phone"
-          />
-          {touched.phone && errors.phone && <p>{errors.phone}</p>}
-          <button type="submit">Submit</button>
-        </Form>
-      )}
+    <>
+      <label htmlFor="phone">Phone number</label>
+      <PhoneInput ref={phone} defaultCountry="US" initialValue={field.value}
+        name={field.name} id="phone"
+        onChange={value => { void helpers.setValue(value); }}
+        onBlur={() => { void helpers.setTouched(true); }}
+        aria-invalid={!!error} aria-describedby={error ? 'phone-error' : undefined} />
+      {error && <p id="phone-error" role="alert">{error}</p>}
+    </>
+  );
+}
+
+export function PhoneForm() {
+  return (
+    <Formik initialValues={{ phone: '+12025551234' }}
+      onSubmit={values => console.log(values.phone)}>
+      <Form>
+        <PhoneField />
+        <button type="reset">Reset</button>
+        <button type="submit">Submit</button>
+      </Form>
     </Formik>
   );
 }
 ```
 
-## Native HTML Form (no JavaScript submission)
+## Ref methods and native props
 
-Use `hiddenInput` and `inputAttributes` for fully declarative forms:
-
-```js
-PhoneInput.mount(el, {
-  defaultCountry: 'US',
-  hiddenInput: { phone: 'phone_e164', country: 'phone_country' },
-  inputAttributes: {
-    name: 'phone_display',   // visible input's name (national format)
-    required: 'true',
-  },
-});
-```
-
-The form will submit three values:
-- `phone_display` — the visible formatted value
-- `phone_e164` — the hidden E.164 value (e.g. `+12025551234`)
-- `phone_country` — the hidden country code (e.g. `US`)
-
-## E.164 vs National Format
-
-| Method | Format | Example | Use case |
-|---|---|---|---|
-| `getValue()` | E.164 | `+12025551234` | API calls, database storage |
-| `getNationalNumber()` | Digits only | `2025551234` | Display, legacy systems |
-| Hidden input (`phone`) | E.164 | `+12025551234` | Form submission |
-
-Always store E.164 format for unambiguous international numbers.
-
-## Input Attributes
-
-Forward any HTML attributes to the `<input>` element via `inputAttributes` (vanilla) or directly as props (React/Preact):
-
-### Vanilla
-
-```js
-PhoneInput.mount(el, {
-  defaultCountry: 'US',
-  inputAttributes: {
-    name: 'phone',
-    id: 'phone-input',
-    'aria-label': 'Phone number',
-    'data-testid': 'phone',
-    required: 'true',
-  },
-});
-```
-
-### React / Preact
-
-```jsx
-<PhoneInput
-  defaultCountry="US"
-  name="phone"
-  id="phone-input"
-  aria-label="Phone number"
-  data-testid="phone"
-  required
-/>
-```
-
-In React/Preact, unrecognized props are automatically forwarded to the input.
+Vanilla instances and React/Preact refs expose `focus()`, `reset()`, and `getInput()` in addition to number/country methods. Framework `value` and `defaultValue` props are intentionally unsupported. Boolean props such as `required={false}` remove the attribute; changing or removing ARIA attributes is synchronized. Events such as `onBlur`, `onFocus`, and `onKeyDown` are native DOM events, not React SyntheticEvents.
 
 ---
 
-## See also
-
-- [API Reference](api-reference.md) — `hiddenInput`, `inputAttributes` options
-- [Validation](validation.md) — validation model and error messages
-- [React Guide](react-guide.md) — React Hook Form and Formik recipes
+See [Validation](validation.md), [React Guide](react-guide.md), and [API Reference](api-reference.md).

@@ -30,7 +30,7 @@
   color: inherit;
   line-height: 1;
   flex-shrink: 0;
-  border-right: 1px solid var(--lpi-border-color, #ccc);
+  border-inline-end: 1px solid var(--lpi-border-color, #ccc);
 }
 
 .lpi__trigger:hover {
@@ -64,7 +64,7 @@ span.lpi__trigger:hover {
 .lpi__arrow {
   font-size: 0.6em;
   opacity: 0.6;
-  margin-left: 2px;
+  margin-inline-start: 2px;
 }
 
 /* Input */
@@ -170,7 +170,7 @@ span.lpi__trigger:hover {
 }
 
 .lpi__option-dial {
-  color: #888;
+  color: var(--lpi-muted-color, #666);
   font-size: 0.9em;
   flex-shrink: 0;
 }
@@ -223,4 +223,19 @@ span.lpi__trigger:hover {
   .lpi__dropdown--fullscreen .lpi__option {
     padding: 12px 16px;
   }
+}
+
+/* Visible dismissal also works with mobile touch and assistive technology. */
+.lpi__close {
+  align-self: flex-end;
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.lpi__close:focus-visible, .lpi__search:focus-visible {
+  outline: 2px solid var(--lpi-focus-color, #4d90fe);
+  outline-offset: -2px;
 }

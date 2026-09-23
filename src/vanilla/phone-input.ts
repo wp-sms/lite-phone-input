@@ -1,8 +1,9 @@
 import type { Country, PhoneInputOptions, ValidationResult } from '../core/types';
-import { getAllCountries, getCountryByCode, getCountryByDialCode, getFlag } from '../core/countries';
+import { getAllCountries, getCountryByCode, getFlag } from '../core/countries';
 import { formatPhone, getCursorPosition, extractDigits, normalizeNumerals, isNonAsciiDigit } from '../core/format';
 import { validatePhone } from '../core/validate';
 import { Dropdown } from './dropdown';
+import { parsePhoneValue } from '../core/parse';
 
 const isClient = typeof window !== 'undefined';
 
@@ -14,6 +15,10 @@ export class PhoneInput {
   private nationalDigits = '';
   private displayInternational = false;
   private userHasInteracted = false;
+  private valueRevision = 0;
+  private unsupportedInternational: string | null = null;
+  private initialCountryCode: string;
+  private initialValue: string;
 
   private get isNationalInput(): boolean {
     return !!this.opts.separateDialCode || !!this.opts.nationalMode;
@@ -42,6 +47,9 @@ export class PhoneInput {
 
     // Resolve default country
     this.selectedCountry = this.resolveCountry(this.opts.defaultCountry) ?? this.countries[0];
+    this.initialCountryCode = this.selectedCountry.code;
+    this.initialValue = this.opts.initialValue ?? '';
+    this.userHasInteracted = !!this.initialValue;
 
     if (isClient) {
       this.buildDOM();
@@ -52,6 +60,7 @@ export class PhoneInput {
         this.setValueInternal(this.opts.initialValue, true);
       }
 
+      this.initialCountryCode = this.selectedCountry.code;
       this.invokeGeoIpLookup();
     }
   }
@@ -63,6 +72,7 @@ export class PhoneInput {
   // --- Public API ---
 
   getValue(): string {
+    if (this.unsupportedInternational !== null) return this.unsupportedInternational;
     if (!this.nationalDigits) return '';
     return `+${this.selectedCountry.dialCode}${this.nationalDigits}`;
   }
@@ -80,10 +90,27 @@ export class PhoneInput {
   }
 
   setValue(e164: string): void {
+    this.valueRevision++;
+    this.userHasInteracted = true;
     this.setValueInternal(e164, true);
   }
 
+  getInput(): HTMLInputElement { return this.inputEl; }
+
+  focus(): void { this.inputEl?.focus(); }
+
+  reset(): void {
+    this.valueRevision++;
+    const previousValue = this.getValue();
+    const previousValid = this.validate().valid;
+    const country = this.resolveCountry(this.initialCountryCode) ?? this.countries[0];
+    this.selectCountry(country, false);
+    this.setValueInternal(this.initialValue, true, previousValue, previousValid);
+  }
+
   setCountry(code: string): void {
+    this.valueRevision++;
+    this.userHasInteracted = true;
     const country = this.resolveCountry(code);
     if (country) this.selectCountry(country, true);
   }
@@ -93,27 +120,41 @@ export class PhoneInput {
   }
 
   validate(): ValidationResult {
-    return validatePhone(this.nationalDigits, this.selectedCountry);
+    const result = validatePhone(this.nationalDigits, this.selectedCountry);
+    return this.unsupportedInternational !== null
+      ? { ...result, valid: false, reason: 'invalid_country' } : result;
   }
 
   setOptions(opts: Partial<PhoneInputOptions>): void {
     const { geoIpLookup: _, ...rest } = opts;
-    const prev = { ...this.opts };
-    Object.assign(this.opts, rest);
-
-    // Re-filter countries if filter options changed
-    if (opts.allowedCountries !== undefined || opts.excludedCountries !== undefined) {
-      this.countries = this.filterCountries(getAllCountries());
-      // Ensure selected country is still in filtered list
-      if (!this.countries.find(c => c.code === this.selectedCountry.code)) {
-        this.selectCountry(this.countries[0], true);
+    const prev = this.opts;
+    const next = { ...prev, ...rest };
+    const filtersChanged = 'allowedCountries' in opts || 'excludedCountries' in opts;
+    // Validate before mutating state so a rejected update is atomic.
+    const countries = filtersChanged ? this.filterCountries(getAllCountries(), next) : this.countries;
+    const previousValue = this.getValue();
+    const previousValid = this.validate().valid;
+    this.opts = next;
+    this.countries = countries;
+    if (filtersChanged) {
+      if (!this.resolveCountry(this.selectedCountry.code)) {
+        this.selectCountry(this.countries[0], false);
       }
-      if (this.dropdown) {
-        this.dropdown.updateCountries(this.countries, this.opts.preferredCountries ?? []);
-      }
+      // Reparse the original canonical value, never reinterpret it with the new dial code.
+      this.setValueInternal(previousValue, true, previousValue, previousValid);
     }
+    if (this.dropdown && (filtersChanged || 'preferredCountries' in opts || 'locale' in opts || 'renderFlag' in opts)) {
+      this.dropdown.updateOptions({ countries, preferredCountries: next.preferredCountries ?? [], locale: next.locale, renderFlag: next.renderFlag });
+    }
+    if ('inputAttributes' in opts) {
+      for (const key of Object.keys(prev.inputAttributes ?? {})) {
+        if (!(key in (next.inputAttributes ?? {}))) this.inputEl.removeAttribute(key);
+      }
+      for (const [key, value] of Object.entries(next.inputAttributes ?? {})) this.inputEl.setAttribute(key, value);
+    }
+    if (next.disabled || next.allowDropdown === false) this.closeDropdown();
 
-    if (opts.disabled !== undefined) {
+    if ('disabled' in opts) {
       this.inputEl.disabled = !!opts.disabled;
       this.containerEl.classList.toggle('lpi--disabled', !!opts.disabled);
       if (this.triggerEl instanceof HTMLButtonElement) {
@@ -122,25 +163,25 @@ export class PhoneInput {
     }
 
     const displayModeChanged =
-      (opts.separateDialCode !== undefined && opts.separateDialCode !== prev.separateDialCode) ||
-      (opts.nationalMode !== undefined && opts.nationalMode !== prev.nationalMode);
+      ('separateDialCode' in opts && opts.separateDialCode !== prev.separateDialCode) ||
+      ('nationalMode' in opts && opts.nationalMode !== prev.nationalMode);
     if (displayModeChanged) {
       this.updateDisplayMode();
     }
 
-    if (opts.renderFlag !== undefined) {
+    if ('renderFlag' in opts) {
       this.updateFlag();
     }
 
-    if (opts.placeholder !== undefined) {
+    if ('placeholder' in opts) {
       this.updatePlaceholder();
     }
 
-    if (opts.formatAsYouType !== undefined || opts.strict !== undefined) {
+    if ('formatAsYouType' in opts || 'strict' in opts) {
       this.reformatInput();
     }
 
-    if (opts.allowDropdown !== undefined) {
+    if ('allowDropdown' in opts) {
       this.rebuildTrigger();
     }
   }
@@ -162,7 +203,11 @@ export class PhoneInput {
 
     lookup((countryCode) => {
       if (signal.aborted || this.userHasInteracted || !countryCode) return;
-      this.setCountry(countryCode);
+      const country = this.resolveCountry(countryCode);
+      if (country) {
+        this.selectCountry(country, true);
+        this.initialCountryCode = country.code;
+      }
     });
   }
 
@@ -233,9 +278,8 @@ export class PhoneInput {
       const btn = document.createElement('button');
       btn.className = 'lpi__trigger';
       btn.type = 'button';
-      btn.setAttribute('role', 'combobox');
       btn.setAttribute('aria-expanded', 'false');
-      btn.setAttribute('aria-haspopup', 'listbox');
+      btn.setAttribute('aria-haspopup', 'dialog');
       btn.setAttribute('aria-label', 'Select country');
       if (this.opts.disabled) btn.disabled = true;
       this.triggerEl = btn;
@@ -287,86 +331,66 @@ export class PhoneInput {
     this.inputEl.addEventListener('input', (e) => this.handleInput(e as InputEvent), { signal });
     this.inputEl.addEventListener('keydown', (e) => this.handleKeyDown(e), { signal });
     this.inputEl.addEventListener('paste', (e) => this.handlePaste(e), { signal });
+    // Delegate reset so later form attributes/DOM moves are respected, including
+    // non-composed reset events inside a ShadowRoot.
+    const onReset = (event: Event) => {
+      if (event.target !== this.inputEl.form) return;
+      const revision = this.valueRevision;
+      // A native reset can run after a microtask checkpoint; use a task.
+      setTimeout(() => {
+        if (event.defaultPrevented || signal.aborted) return;
+        if (revision === this.valueRevision) this.reset();
+        else {
+          // A form library supplied a newer value during/after reset.
+          this.reformatInput();
+          this.syncHiddenInputs();
+        }
+      }, 0);
+    };
+    for (const root of new Set([this.inputEl.ownerDocument, this.inputEl.getRootNode()])) {
+      root.addEventListener('reset', onReset, { signal });
+    }
   }
 
   private handleInput(e: InputEvent): void {
+    if (this.opts.disabled || this.inputEl.readOnly || e.isComposing) return;
+    this.valueRevision++;
     this.userHasInteracted = true;
-    // Android sends e.key="Unidentified" for +, so keydown can't filter it.
-    // Fall back to InputEvent.data (same approach as intl-tel-input).
+    // A standalone + typed in national mode is not a replacement phone number.
     if (this.opts.strict !== false && e.data === '+' && this.isNationalInput) {
       this.inputEl.value = this.inputEl.value.replace('+', '');
     }
+    this.applyInputValue(this.inputEl.value, this.inputEl.selectionStart ?? 0,
+      e.inputType !== 'insertReplacementText' && e.inputType !== 'insertFromPaste');
+  }
 
-    const oldCursor = this.inputEl.selectionStart ?? 0;
-    let raw = normalizeNumerals(this.inputEl.value);
-
-    if (this.isNationalInput) {
-      // Input contains only national number
-      let digits = extractDigits(raw);
-
-      // Strip national prefix if typed at start
-      digits = this.stripNationalPrefix(digits);
-
-      // Enforce strict max length
-      if (this.opts.strict !== false && digits.length > this.selectedCountry.maxLength) {
-        digits = digits.slice(0, this.selectedCountry.maxLength);
-      }
-
-      this.nationalDigits = digits;
-
-      const formatted = this.formatNationalValue(digits);
-      const np = this.shouldPrependPrefix ? this.selectedCountry.nationalPrefix! : '';
-      // Edge case: user typed just the national prefix (e.g. "0" for GB)
-      // digits is empty after stripping, but we still show the prefix
-      const display = (!digits && np && extractDigits(raw).length > 0)
-        ? np
-        : (digits && np ? np + formatted : formatted);
-
-      const newCursor = this.getNationalCursor(raw, oldCursor, formatted);
-      this.inputEl.value = display;
-      this.inputEl.setSelectionRange(newCursor, newCursor);
-    } else {
-      // Inline mode: input contains +{dialCode}{national} or just national
-      const digits = extractDigits(raw);
-      const hasPlus = raw.startsWith('+');
-      this.displayInternational = hasPlus;
-
-      if (hasPlus && digits.length > 0) {
-        // Try to detect country from dial code
-        this.detectCountryFromDigits(digits, false);
-      }
-
-      // Extract national digits (remove dial code portion)
-      let national = this.extractNationalFromFull(digits, hasPlus);
-      national = this.stripNationalPrefix(national);
-
-      // Enforce strict max length
-      if (this.opts.strict !== false && national.length > this.selectedCountry.maxLength) {
-        national = national.slice(0, this.selectedCountry.maxLength);
-      }
-
-      this.nationalDigits = national;
-
-      let formatted: string;
-      if (hasPlus) {
-        const dc = this.selectedCountry.dialCode;
-        if (digits.startsWith(dc) && national.length > 0) {
-          formatted = `+${dc} ${this.formatNationalValue(national)}`;
-        } else {
-          // Still typing dial code or partial match — show raw
-          formatted = `+${digits}`;
-        }
-      } else {
-        formatted = this.formatNationalValue(national);
-      }
-
-      const newCursor = getCursorPosition(raw, oldCursor, formatted);
-      this.inputEl.value = formatted;
-      this.inputEl.setSelectionRange(newCursor, newCursor);
+  private applyInputValue(value: string, cursor: number, limitLocal: boolean): void {
+    const raw = normalizeNumerals(value);
+    const parsed = parsePhoneValue(raw, this.countries, this.selectedCountry);
+    this.applyParsedValue(parsed);
+    // Never truncate a complete replacement, paste or explicit international number.
+    if (limitLocal && !parsed.international && this.opts.strict !== false) {
+      this.nationalDigits = this.nationalDigits.slice(0, this.selectedCountry.maxLength);
     }
-
+    this.displayInternational = parsed.international && !this.isNationalInput;
+    this.reformatInput();
+    if (!this.nationalDigits && this.shouldPrependPrefix && extractDigits(raw)) {
+      this.inputEl.value = this.selectedCountry.nationalPrefix!;
+    }
+    const position = this.isNationalInput && this.unsupportedInternational === null
+      ? (parsed.international ? this.inputEl.value.length : this.getNationalCursor(raw, cursor, this.formatNationalValue()))
+      : getCursorPosition(raw, cursor, this.inputEl.value);
+    this.inputEl.setSelectionRange(position, position);
     this.syncHiddenInputs();
     this.fireCallbacks();
+  }
+
+  private applyParsedValue(parsed: ReturnType<typeof parsePhoneValue>): void {
+    this.unsupportedInternational = parsed.country ? null : `+${parsed.digits}`;
+    if (parsed.country && parsed.country.code !== this.selectedCountry.code) {
+      this.selectCountry(parsed.country, false);
+    }
+    this.nationalDigits = parsed.country ? this.stripNationalPrefix(parsed.digits) : parsed.digits;
   }
 
   private handleKeyDown(e: KeyboardEvent): void {
@@ -395,48 +419,23 @@ export class PhoneInput {
   }
 
   private handlePaste(e: ClipboardEvent): void {
-    this.userHasInteracted = true;
+    if (this.opts.disabled || this.inputEl.readOnly) return;
     e.preventDefault();
     const text = e.clipboardData?.getData('text') ?? '';
     if (!text) return;
-
-    const cleaned = normalizeNumerals(text);
-    let digits = cleaned.replace(/[^\d]/g, '');
-    const isInternational = cleaned.startsWith('+') || cleaned.startsWith('00');
-
-    if (isInternational) {
-      // Strip 00 prefix digits (already converted to plain digits by replace above)
-      if (cleaned.startsWith('00')) {
-        digits = digits.slice(2);
-      }
-      this.detectCountryFromDigits(digits, false);
-      digits = this.extractNationalFromFull(digits, true);
-    }
-
-    digits = this.stripNationalPrefix(digits);
-
-    if (this.opts.strict !== false && digits.length > this.selectedCountry.maxLength) {
-      digits = digits.slice(0, this.selectedCountry.maxLength);
-    }
-
-    this.nationalDigits = digits;
-    this.displayInternational = isInternational && !this.isNationalInput;
-
-    // Update display
-    if (this.isNationalInput) {
-      this.inputEl.value = this.formatNationalDisplay();
-    } else {
-      this.inputEl.value = this.displayInternational
-        ? this.formatFullValue()
-        : this.formatNationalValue();
-    }
-
-    this.syncHiddenInputs();
-    this.fireCallbacks();
+    this.valueRevision++;
+    this.userHasInteracted = true;
+    const cleaned = normalizeNumerals(text).trim();
+    const international = cleaned.startsWith('+') || cleaned.startsWith('00');
+    const start = this.inputEl.selectionStart ?? 0;
+    const end = this.inputEl.selectionEnd ?? start;
+    const value = international ? cleaned
+      : this.inputEl.value.slice(0, start) + extractDigits(cleaned) + this.inputEl.value.slice(end);
+    this.applyInputValue(value, international ? value.length : start + extractDigits(cleaned).length, false);
   }
 
   private handleTriggerClick(): void {
-    if (this.opts.allowDropdown === false) return;
+    if (this.opts.disabled || this.opts.allowDropdown === false) return;
 
     if (this.dropdown) {
       this.closeDropdown();
@@ -462,9 +461,9 @@ export class PhoneInput {
         this.closeDropdown();
         this.inputEl.focus();
       },
-      onClose: () => {
+      onClose: (restoreFocus = true) => {
         this.closeDropdown();
-        if (this.triggerEl instanceof HTMLButtonElement) {
+        if (restoreFocus && this.triggerEl instanceof HTMLButtonElement) {
           this.triggerEl.focus();
         }
       },
@@ -475,6 +474,7 @@ export class PhoneInput {
     this.containerEl.classList.add('lpi--open');
     if (this.triggerEl instanceof HTMLButtonElement) {
       this.triggerEl.setAttribute('aria-expanded', 'true');
+      this.triggerEl.setAttribute('aria-controls', this.dropdown.dialogId);
     }
     this.opts.onDropdownOpen?.();
   }
@@ -487,6 +487,7 @@ export class PhoneInput {
     this.containerEl.classList.remove('lpi--open');
     if (this.triggerEl instanceof HTMLButtonElement) {
       this.triggerEl.setAttribute('aria-expanded', 'false');
+      this.triggerEl.removeAttribute('aria-controls');
     }
     this.opts.onDropdownClose?.();
   }
@@ -511,30 +512,6 @@ export class PhoneInput {
       this.opts.onCountryChange?.(country);
       if (fireEvent) this.fireCallbacks();
     }
-  }
-
-  private detectCountryFromDigits(digits: string, fireEvent = true): void {
-    // Try longest dial code first (up to 4 digits)
-    for (let len = Math.min(4, digits.length); len >= 1; len--) {
-      const prefix = digits.slice(0, len);
-      const match = getCountryByDialCode(this.countries, prefix);
-      if (match) {
-        // If current country already matches this dial code, don't switch
-        if (this.selectedCountry.dialCode === prefix) return;
-        this.selectCountry(match, fireEvent);
-        return;
-      }
-    }
-  }
-
-  private extractNationalFromFull(digits: string, hasInternationalPrefix: boolean): string {
-    if (!hasInternationalPrefix) return digits;
-
-    const dc = this.selectedCountry.dialCode;
-    if (digits.startsWith(dc)) {
-      return digits.slice(dc.length);
-    }
-    return digits;
   }
 
   private stripNationalPrefix(digits: string): string {
@@ -586,7 +563,7 @@ export class PhoneInput {
   }
 
   private formatFullValue(): string {
-    if (!this.nationalDigits) return '';
+    if (!this.nationalDigits) return this.displayInternational ? `+${this.selectedCountry.dialCode}` : '';
     return `+${this.selectedCountry.dialCode} ${this.formatNationalValue()}`;
   }
 
@@ -597,6 +574,7 @@ export class PhoneInput {
     } else {
       this.flagEl.textContent = getFlag(this.selectedCountry.code);
     }
+    this.triggerEl?.setAttribute('aria-label', `Select country: ${this.selectedCountry.name} (+${this.selectedCountry.dialCode})`);
   }
 
   private updateDialCodeDisplay(): void {
@@ -666,7 +644,9 @@ export class PhoneInput {
   private reformatInput(): void {
     if (!this.inputEl) return;
 
-    if (this.isNationalInput) {
+    if (this.unsupportedInternational !== null) {
+      this.inputEl.value = this.unsupportedInternational;
+    } else if (this.isNationalInput) {
       this.inputEl.value = this.formatNationalDisplay();
     } else {
       this.inputEl.value = this.displayInternational
@@ -677,19 +657,20 @@ export class PhoneInput {
 
   // --- Helpers ---
 
-  private filterCountries(all: Country[]): Country[] {
+  private filterCountries(all: Country[], options = this.opts): Country[] {
     let filtered = all;
 
-    if (this.opts.allowedCountries?.length) {
-      const allowed = new Set(this.opts.allowedCountries.map(c => c.toUpperCase()));
+    if (options.allowedCountries?.length) {
+      const allowed = new Set(options.allowedCountries.map(c => c.toUpperCase()));
       filtered = filtered.filter(c => allowed.has(c.code));
     }
 
-    if (this.opts.excludedCountries?.length) {
-      const excluded = new Set(this.opts.excludedCountries.map(c => c.toUpperCase()));
+    if (options.excludedCountries?.length) {
+      const excluded = new Set(options.excludedCountries.map(c => c.toUpperCase()));
       filtered = filtered.filter(c => !excluded.has(c.code));
     }
 
+    if (!filtered.length) throw new RangeError('PhoneInput requires at least one country after filtering.');
     return filtered;
   }
 
@@ -697,10 +678,16 @@ export class PhoneInput {
     return getCountryByCode(this.countries, code);
   }
 
-  private setValueInternal(e164: string, updateInput: boolean): void {
-    const prevValue = this.getValue();
+  private setValueInternal(
+    e164: string,
+    updateInput: boolean,
+    prevValue = this.getValue(),
+    prevValid = this.validate().valid,
+  ): void {
 
     if (!e164) {
+      this.displayInternational = false;
+      this.unsupportedInternational = null;
       this.nationalDigits = '';
       if (updateInput) this.reformatInput();
       this.syncHiddenInputs();
@@ -708,21 +695,12 @@ export class PhoneInput {
       return;
     }
 
-    let digits = extractDigits(normalizeNumerals(e164));
-    const hasPlus = e164.startsWith('+');
-
-    if (hasPlus) {
-      this.detectCountryFromDigits(digits, false);
-      digits = this.extractNationalFromFull(digits, true);
-    }
-
-    digits = this.stripNationalPrefix(digits);
-    this.nationalDigits = digits;
+    this.applyParsedValue(parsePhoneValue(e164, this.countries, this.selectedCountry));
     this.displayInternational = !this.isNationalInput;
 
     if (updateInput) this.reformatInput();
     this.syncHiddenInputs();
-    if (this.getValue() !== prevValue) this.fireCallbacks();
+    if (this.getValue() !== prevValue || this.validate().valid !== prevValid) this.fireCallbacks();
   }
 
   private syncHiddenInputs(): void {
@@ -735,7 +713,7 @@ export class PhoneInput {
   }
 
   private fireCallbacks(): void {
-    const v = validatePhone(this.nationalDigits, this.selectedCountry);
+    const v = this.validate();
     const e164 = this.getValue();
 
     this.opts.onChange?.(e164, this.selectedCountry, v);

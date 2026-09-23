@@ -277,3 +277,30 @@ describe('Preact PhoneInput', () => {
     });
   });
 });
+
+
+describe('native input props', () => {
+  it('handles boolean props, events, changing attributes and removals', () => {
+    const onBlur = vi.fn();
+    renderInto(<PhoneInput defaultCountry="US" required={false} onBlur={onBlur} aria-invalid={false} />);
+    const input = container.querySelector('input')!;
+    expect(input.required).toBe(false);
+    input.dispatchEvent(new Event('blur'));
+    expect(onBlur).toHaveBeenCalledOnce();
+    renderInto(<PhoneInput defaultCountry="US" required aria-invalid aria-describedby="error" />);
+    expect(input.required).toBe(true);
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(input.getAttribute('aria-describedby')).toBe('error');
+    renderInto(<PhoneInput defaultCountry="US" />);
+    expect(input.required).toBe(false);
+    expect(input.hasAttribute('aria-describedby')).toBe(false);
+    input.dispatchEvent(new Event('blur'));
+    expect(onBlur).toHaveBeenCalledOnce();
+  });
+  it('restores defaults when an option is removed', () => {
+    renderInto(<PhoneInput defaultCountry="US" disabled />);
+    const input = container.querySelector('input')!;
+    renderInto(<PhoneInput defaultCountry="US" />);
+    expect(input.disabled).toBe(false);
+  });
+});

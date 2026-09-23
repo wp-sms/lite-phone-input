@@ -6,8 +6,8 @@ Thank you for your interest in contributing! This guide covers development setup
 
 ### Prerequisites
 
-- Node.js 18+
-- npm 9+
+- Node.js 24 (see `.nvmrc`); CI also checks Node.js 22
+- npm bundled with Node.js 24
 
 ### Getting Started
 
@@ -26,6 +26,9 @@ npm test               # Run tests (vitest)
 npm run test:watch     # Run tests in watch mode
 npm run test:coverage  # Run tests with coverage
 npm run typecheck      # TypeScript type checking (tsc --noEmit)
+npm run test:browser   # Build, then Chromium/Firefox/WebKit/mobile integration + axe
+npm run test:package   # Build and test the actual npm tarball (React 17/19, Preact 10)
+npm run check:data     # Verify generated metadata against the pinned source
 npm run example        # Build and open vanilla example
 ```
 
@@ -113,7 +116,7 @@ Open an issue describing:
 
 ## Testing
 
-Tests use [Vitest](https://vitest.dev/) with jsdom for DOM testing.
+Tests use [Vitest](https://vitest.dev/) with jsdom for fast regressions. Browser tests use Playwright and axe. Install browsers once with `npx playwright install chromium firefox webkit` (on Linux CI, add `--with-deps`). Package checks install disposable consumers from the actual npm tarball and remove them afterward.
 
 ```bash
 npm test                  # Run all tests
@@ -134,12 +137,24 @@ Country data lives in `data/phone-countries.json`. To regenerate:
 npm run generate-data
 ```
 
+The generator pins a libphonenumber commit in `METADATA_REVISION`. Update that revision deliberately, run generation with Node.js 24, and review the country changes. `data/metadata-source.json` records the source revision and SHA-256. Verification failures exit unsuccessfully before writing either artifact.
+
 This runs `scripts/generate-data.mjs`, which produces the JSON file with format masks, dial codes, validation lengths, and priorities for all countries.
 
 After regenerating:
 1. Spot-check a few countries for correctness
 2. Run the tests to ensure nothing broke
 3. Note any changes in your PR description
+
+## Releases
+
+Use Node.js 24 and start from an up-to-date `main` checkout. Update the version with `npm version <version> --no-git-tag-version`, date the changelog entry, and document any API or behavior changes in the upgrade notes.
+
+Before tagging, run `npm run typecheck`, `npm run test:coverage`, `npm run test:package`, `npm run test:browser`, and `npm run check:data`. Commit the release changes, push `main`, and wait for CI to pass.
+
+An annotated `v<version>` tag pushed to GitHub triggers `.github/workflows/publish.yml`. That workflow repeats validation and publishes to npm using trusted publishing (OIDC). No local npm token is required. Create the matching GitHub release from the changelog and verify the npm version and `latest` dist-tag after the publishing job succeeds. Never move an already-published release tag.
+
+The esbuild override keeps the development toolchain on a fixed security release while upstream dependency ranges lag. Re-evaluate it when updating tsup/Vite, and rerun the package and browser checks before removing it.
 
 ## License
 
