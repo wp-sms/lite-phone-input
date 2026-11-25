@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Country list no longer closes itself when opened inside a scrolling container; opening or arrowing through the list no longer scrolls the page (issue #4).
+- Country search now finds countries in translated lists by their English name, by dial codes typed with `+` (`+98`), by dial codes in non-Latin digits (`۹۸`, `٩٨`) and by Persian names typed with Arabic-keyboard letters (`ي`, `ى`, `ك`). Typing digits also matches dial codes that start with them (issue #3).
 
 ## [0.6.0] - 2026-09-23
 

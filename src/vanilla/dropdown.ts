@@ -1,5 +1,6 @@
 import type { Country } from '../core/types';
 import { getFlag } from '../core/countries';
+import { normalizeNumerals } from '../core/format';
 
 export interface DropdownOptions {
   countries: Country[];
@@ -19,6 +20,18 @@ const DROPDOWN_GAP = 2;
 const DROPDOWN_MIN_HEIGHT = 150;
 
 /** Screen pixels per CSS pixel for an element (≠ 1 inside a scale() transform). */
+/**
+ * Normalize text for search: ASCII digits, Arabic ي/ى/ك folded to Persian ی/ک
+ * (common on Arabic keyboard layouts), trimmed and lowercased.
+ */
+function normalizeSearch(s: string): string {
+  return normalizeNumerals(s)
+    .replace(/[\u064A\u0649]/g, '\u06CC')
+    .replace(/\u0643/g, '\u06A9')
+    .trim()
+    .toLowerCase();
+}
+
 function screenScale(el: HTMLElement, box: DOMRect): number {
   return el.offsetHeight > 0 && box.height > 0 ? box.height / el.offsetHeight : 1;
 }
@@ -333,26 +346,36 @@ export class Dropdown {
     return country.name;
   }
 
-  /** 3-bucket search: exact code/dial → starts-with → contains */
+  /**
+   * 3-bucket search: exact code/dial → starts-with → contains.
+   * Matches the localized and English names; accepts `+` dial codes and non-ASCII digits.
+   */
   search(query: string): Country[] {
-    if (!query) return this.getOrderedCountries();
-
-    const q = query.trim().toLowerCase();
-    const qUpper = q.toUpperCase();
+    const q = normalizeSearch(query);
     const ordered = this.getOrderedCountries();
+    if (!q || q === '+') return ordered;
+
+    const qUpper = q.toUpperCase();
+    const qDial = q.replace(/^\+/, '');
+    const qIsDial = /^\d+$/.test(qDial);
 
     const exact: Country[] = [];
     const startsWith: Country[] = [];
     const contains: Country[] = [];
 
     for (const c of ordered) {
-      const name = this.getCountryName(c).toLowerCase();
+      const local = normalizeSearch(this.getCountryName(c));
+      const english = c.name.toLowerCase();
 
-      if (c.code === qUpper || c.dialCode === q) {
+      if (c.code === qUpper || c.dialCode === qDial) {
         exact.push(c);
-      } else if (name.startsWith(q)) {
+      } else if (
+        local.startsWith(q) ||
+        english.startsWith(q) ||
+        (qIsDial && c.dialCode.startsWith(qDial))
+      ) {
         startsWith.push(c);
-      } else if (name.includes(q)) {
+      } else if (local.includes(q) || english.includes(q)) {
         contains.push(c);
       }
     }
