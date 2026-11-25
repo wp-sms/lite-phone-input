@@ -13,6 +13,10 @@ export interface DropdownOptions {
 }
 
 let nextId = 0;
+/** Matches .lpi__dropdown margin-top/-bottom in styles.css. */
+const DROPDOWN_GAP = 2;
+/** Keep the search box plus a few rows usable even when little room is left. */
+const DROPDOWN_MIN_HEIGHT = 150;
 
 export class Dropdown {
   private id: number;
@@ -106,8 +110,8 @@ export class Dropdown {
       this.position(anchorEl);
     }
 
-    // Focus search
-    this.searchInput.focus();
+    // Focus search without scrolling ancestors: their scroll listeners would close the list.
+    this.searchInput.focus({ preventScroll: true });
 
     // Highlight selected country
     const selectedIdx = this.filteredItems.findIndex(c => c.code === this.options.selectedCode);
@@ -144,8 +148,14 @@ export class Dropdown {
       root.addEventListener('touchstart', outside, { signal, passive: true });
     }
     window.addEventListener('resize', () => this.options.onClose(false), { signal });
-    window.addEventListener('scroll', () => this.options.onClose(false), { signal, passive: true });
-    this.setupScrollListeners(anchorEl, signal);
+    // A portal list is placed at fixed coordinates, so any scroll would detach it from
+    // the field. An inline list scrolls along with the field: keep it open, otherwise a
+    // scrolling container (a modal body, or the browser revealing the search caret)
+    // closes it.
+    if (this.isPortal(anchorEl)) {
+      window.addEventListener('scroll', () => this.options.onClose(false), { signal, passive: true });
+      this.setupScrollListeners(anchorEl, signal);
+    }
   }
 
   close(): void {
@@ -423,6 +433,10 @@ export class Dropdown {
     }
   }
 
+  private isPortal(anchorEl: HTMLElement): boolean {
+    return this.options.container !== anchorEl.parentElement;
+  }
+
   private position(anchorEl: HTMLElement): void {
     if (!this.el) return;
 
@@ -433,10 +447,7 @@ export class Dropdown {
     // Use calculated positioning when the dropdown is outside .lpi (portal mode).
     // CSS-only positioning (top: 100%) only works when the dropdown is a child of .lpi
     // which has position: relative.
-    const container = this.options.container;
-    const isPortal = container !== anchorEl.parentElement;
-
-    if (isPortal) {
+    if (this.isPortal(anchorEl)) {
       this.el.style.position = 'fixed';
       // Neutralize CSS defaults that conflict with fixed positioning
       this.el.style.bottom = 'auto';
@@ -454,13 +465,41 @@ export class Dropdown {
       }
       this.el.style.width = `${Math.max(rect.width, 280)}px`;
     } else {
-      // Inside .lpi — CSS handles positioning via top: 100% + position: relative parent
-      if (spaceBelow >= 300 || spaceBelow >= spaceAbove) {
-        this.el.classList.remove('lpi__dropdown--above');
-      } else {
-        this.el.classList.add('lpi__dropdown--above');
-      }
+      // Inside .lpi — CSS handles positioning via top: 100% + position: relative parent.
+      // Scrolling ancestors (e.g. a modal body) clip the list, so measure the room
+      // inside their visible area rather than the window. Open on the side where the
+      // list fits (or the roomier side), and shrink it to fit that side.
+      const view = this.visibleBounds(anchorEl);
+      const below = view.bottom - rect.bottom - DROPDOWN_GAP;
+      const above = rect.top - view.top - DROPDOWN_GAP;
+      const height = this.el.getBoundingClientRect().height;
+      const down = below >= height || below >= above;
+      this.el.classList.toggle('lpi__dropdown--above', !down);
+      const room = Math.floor(down ? below : above);
+      if (room < height) this.el.style.maxHeight = `${Math.max(room, DROPDOWN_MIN_HEIGHT)}px`;
     }
+  }
+
+  /** Vertical bounds of the area where an inline list can be seen: the viewport, cut by clipping ancestors. */
+  private visibleBounds(anchorEl: HTMLElement): { top: number; bottom: number } {
+    let top = 0;
+    let bottom = window.innerHeight;
+    const doc = anchorEl.ownerDocument;
+    let node: Element | null = anchorEl.parentElement;
+    // <body>/<html> overflow applies to the viewport, so stop before them.
+    while (node && node !== doc.body && node !== doc.documentElement) {
+      const style = getComputedStyle(node);
+      if (style.overflowY !== 'visible' && node.clientHeight > 0) {
+        const edge = node.getBoundingClientRect().top + node.clientTop;
+        top = Math.max(top, edge);
+        bottom = Math.min(bottom, edge + node.clientHeight);
+      }
+      // Ancestors of a fixed box don't clip it.
+      if (style.position === 'fixed') break;
+      const parent: Node | null = node.parentNode;
+      node = parent instanceof ShadowRoot ? parent.host : node.parentElement;
+    }
+    return { top, bottom };
   }
 
   private updateHighlight(index: number): void {
@@ -476,9 +515,23 @@ export class Dropdown {
     const item = this.getOptionElement(index);
     if (item) {
       item.classList.add('lpi__option--highlighted');
-      item.scrollIntoView?.({ block: 'nearest' });
+      this.scrollItemIntoList(item);
       this.searchInput.setAttribute('aria-activedescendant', item.id);
     }
+  }
+
+  /**
+   * Scroll only the list so the item is visible ("nearest"). Unlike
+   * scrollIntoView(), this never scrolls the page or a scrolling container
+   * around the field, whose scroll listeners would close the list.
+   */
+  private scrollItemIntoList(item: HTMLElement): void {
+    const list = this.listEl;
+    if (!list) return;
+    const l = list.getBoundingClientRect();
+    const r = item.getBoundingClientRect();
+    if (r.top < l.top) list.scrollTop += r.top - l.top;
+    else if (r.bottom > l.bottom) list.scrollTop += r.bottom - l.bottom;
   }
 
   private getOptionElement(index: number): HTMLLIElement | null {

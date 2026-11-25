@@ -116,6 +116,63 @@ describe('Dropdown', () => {
     });
   });
 
+  describe('scrolling (issue #4)', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+      delete (Element.prototype as Partial<Element>).scrollIntoView;
+    });
+
+    it('focuses the search input without scrolling ancestors', () => {
+      const focus = vi.spyOn(HTMLInputElement.prototype, 'focus');
+      const { dropdown, container } = createDropdown();
+      dropdown.open(anchor);
+      expect(focus).toHaveBeenCalledWith({ preventScroll: true });
+      expect(document.activeElement).toBe(container.querySelector('.lpi__search'));
+      dropdown.destroy();
+    });
+
+    it('never calls scrollIntoView on open or arrow navigation', () => {
+      const scrollIntoView = vi.fn();
+      Element.prototype.scrollIntoView = scrollIntoView;
+      const { dropdown, container } = createDropdown();
+      dropdown.open(anchor);
+      const el = container.querySelector('.lpi__dropdown')!;
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+      el.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true }));
+      expect(container.querySelector('.lpi__option--highlighted')).toBeTruthy();
+      expect(scrollIntoView).not.toHaveBeenCalled();
+      dropdown.destroy();
+    });
+
+    it('still closes a portal list when a scrollable ancestor of the anchor scrolls', () => {
+      const scroller = document.createElement('div');
+      scroller.style.overflowY = 'auto';
+      document.body.appendChild(scroller);
+      scroller.appendChild(anchor);
+      const { dropdown, onClose } = createDropdown();
+      dropdown.open(anchor);
+      expect(onClose).not.toHaveBeenCalled();
+      scroller.dispatchEvent(new Event('scroll'));
+      expect(onClose).toHaveBeenCalledWith(false);
+      dropdown.destroy();
+    });
+
+    it('keeps an inline list open when an ancestor or the window scrolls', () => {
+      const scroller = document.createElement('div');
+      const lpi = document.createElement('div');
+      document.body.appendChild(scroller);
+      scroller.appendChild(lpi);
+      lpi.appendChild(anchor);
+      const { dropdown, onClose } = createDropdown({ container: lpi });
+      dropdown.open(anchor);
+      scroller.dispatchEvent(new Event('scroll'));
+      window.dispatchEvent(new Event('scroll'));
+      expect(onClose).not.toHaveBeenCalled();
+      expect(dropdown.isOpen()).toBe(true);
+      dropdown.destroy();
+    });
+  });
+
   describe('keyboard navigation', () => {
     it('arrow down moves highlight', () => {
       const { dropdown, container } = createDropdown();

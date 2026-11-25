@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- An inline country list (`dropdownContainer` set to the field's `.lpi` wrapper) now fits inside scrolling containers such as modal bodies: it opens above the field or shrinks when there isn't room below.
+- An inline country list no longer closes when the page or a scrolling container scrolls, since it moves with the field. Portal lists still close on scroll.
+
+### Fixed
+
+- Country list no longer closes itself when opened inside a scrolling container; opening or arrowing through the list no longer scrolls the page (issue #4).
+
 ## [0.6.0] - 2026-09-23
 
 ### Upgrade notes

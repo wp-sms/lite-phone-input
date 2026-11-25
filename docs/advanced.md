@@ -74,6 +74,12 @@ PhoneInput.mount(el, {
 ```
 
 When using a portal container (including the default `document.body`), the dropdown uses `position: fixed` to stay aligned with the trigger regardless of scroll position.
+It closes when the page or a scrolling ancestor of the field scrolls, since it would otherwise drift away from the field.
+
+If `dropdownContainer` is the field's own `.lpi` wrapper, the list renders inline (`position: absolute`) and scrolls along with the field. Use this inside dialogs that use `transform` or `overflow: hidden`, where a `position: fixed` list would be misplaced or clipped. An inline list:
+
+- stays open when a scrolling container (for example a modal body) or the page scrolls;
+- opens below the field when it fits within the visible part of its scrolling containers, otherwise on the side with more room, shrinking to fit (but not below 150px).
 
 ## Dynamic Options
 
