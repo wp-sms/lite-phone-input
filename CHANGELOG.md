@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-11-25
+
 ### Fixed
 
 - Preact `PhoneInputProps` types work with Preact 11. Previously its input attributes fell back to an untyped index signature (or reported a type error without `skipLibCheck`). With Preact 10, input-specific attributes such as `autoComplete` are now accepted.
@@ -127,6 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TypeScript-first** — written in TypeScript with full type definitions
 - **Zero runtime dependencies**
 
+[0.7.1]: https://github.com/wp-sms/lite-phone-input/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.4.0...v0.5.0
