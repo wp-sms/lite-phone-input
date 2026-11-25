@@ -18,6 +18,11 @@ const DROPDOWN_GAP = 2;
 /** Keep the search box plus a few rows usable even when little room is left. */
 const DROPDOWN_MIN_HEIGHT = 150;
 
+/** Screen pixels per CSS pixel for an element (≠ 1 inside a scale() transform). */
+function screenScale(el: HTMLElement, box: DOMRect): number {
+  return el.offsetHeight > 0 && box.height > 0 ? box.height / el.offsetHeight : 1;
+}
+
 export class Dropdown {
   private id: number;
   private el: HTMLDivElement | null = null;
@@ -469,14 +474,16 @@ export class Dropdown {
       // Scrolling ancestors (e.g. a modal body) clip the list, so measure the room
       // inside their visible area rather than the window. Open on the side where the
       // list fits (or the roomier side), and shrink it to fit that side.
+      // Rects are in screen pixels; a scaled ancestor makes them differ from CSS pixels.
       const view = this.visibleBounds(anchorEl);
-      const below = view.bottom - rect.bottom - DROPDOWN_GAP;
-      const above = rect.top - view.top - DROPDOWN_GAP;
-      const height = this.el.getBoundingClientRect().height;
-      const down = below >= height || below >= above;
+      const box = this.el.getBoundingClientRect();
+      const scale = screenScale(this.el, box);
+      const below = view.bottom - rect.bottom - DROPDOWN_GAP * scale;
+      const above = rect.top - view.top - DROPDOWN_GAP * scale;
+      const down = below >= box.height || below >= above;
       this.el.classList.toggle('lpi__dropdown--above', !down);
-      const room = Math.floor(down ? below : above);
-      if (room < height) this.el.style.maxHeight = `${Math.max(room, DROPDOWN_MIN_HEIGHT)}px`;
+      const room = Math.floor((down ? below : above) / scale);
+      if (room < box.height / scale) this.el.style.maxHeight = `${Math.max(room, DROPDOWN_MIN_HEIGHT)}px`;
     }
   }
 
@@ -489,10 +496,12 @@ export class Dropdown {
     // <body>/<html> overflow applies to the viewport, so stop before them.
     while (node && node !== doc.body && node !== doc.documentElement) {
       const style = getComputedStyle(node);
-      if (style.overflowY !== 'visible' && node.clientHeight > 0) {
-        const edge = node.getBoundingClientRect().top + node.clientTop;
+      if (style.overflowY !== 'visible' && node instanceof HTMLElement && node.clientHeight > 0) {
+        const box = node.getBoundingClientRect();
+        const scale = screenScale(node, box);
+        const edge = box.top + node.clientTop * scale;
         top = Math.max(top, edge);
-        bottom = Math.min(bottom, edge + node.clientHeight);
+        bottom = Math.min(bottom, edge + node.clientHeight * scale);
       }
       // Ancestors of a fixed box don't clip it.
       if (style.position === 'fixed') break;
@@ -530,8 +539,10 @@ export class Dropdown {
     if (!list) return;
     const l = list.getBoundingClientRect();
     const r = item.getBoundingClientRect();
-    if (r.top < l.top) list.scrollTop += r.top - l.top;
-    else if (r.bottom > l.bottom) list.scrollTop += r.bottom - l.bottom;
+    // Rect deltas are screen pixels; scrollTop is CSS pixels.
+    const scale = screenScale(list, l);
+    if (r.top < l.top) list.scrollTop += (r.top - l.top) / scale;
+    else if (r.bottom > l.bottom) list.scrollTop += (r.bottom - l.bottom) / scale;
   }
 
   private getOptionElement(index: number): HTMLLIElement | null {

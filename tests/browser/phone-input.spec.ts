@@ -101,10 +101,10 @@ test('widget passes automated accessibility checks closed and open', async ({ pa
 });
 
 /** A transformed modal (centered, or pinned near the top) whose body scrolls, with the field rendered inline inside it. */
-async function mountInModal(page: Page, { height, before, after = 0, top }: { height: number; before: number; after?: number; top?: number }) {
-  await page.evaluate(({ height, before, after, top }) => {
+async function mountInModal(page: Page, { height, before, after = 0, top, scale = 1 }: { height: number; before: number; after?: number; top?: number; scale?: number }) {
+  await page.evaluate(({ height, before, after, top, scale }) => {
     const modal = document.createElement('div');
-    const place = top === undefined ? 'top:50%;transform:translate(-50%,-50%)' : `top:${top}px;transform:translateX(-50%)`;
+    const place = top === undefined ? `top:50%;transform:translate(-50%,-50%) scale(${scale})` : `top:${top}px;transform:translateX(-50%) scale(${scale})`;
     modal.style.cssText = `position:fixed;${place};left:50%;width:360px;background:#fff;border:1px solid #ccc`;
     const body = document.createElement('div');
     body.id = 'modal-body';
@@ -113,7 +113,7 @@ async function mountInModal(page: Page, { height, before, after = 0, top }: { he
     body.append(spacer(before), document.querySelector('#mount')!, spacer(after));
     modal.append(body);
     document.body.append(modal);
-  }, { height, before, after, top });
+  }, { height, before, after, top, scale });
   await mount(page, { defaultCountry: 'US' });
   await page.evaluate(() => (window as any).phone.setOptions({ dropdownContainer: document.querySelector('#mount .lpi') }));
 }
@@ -130,7 +130,7 @@ const layout = (page: Page) => page.evaluate(() => {
   const d = dropdown.getBoundingClientRect();
   return {
     above: dropdown.classList.contains('lpi__dropdown--above'),
-    fitsInBody: d.top >= b.top + body.clientTop - 1 && d.bottom <= b.top + body.clientTop + body.clientHeight + 1,
+    fitsInBody: d.top >= b.top - 1 && d.bottom <= b.bottom + 1, // modal body has no border
     listScrollTop: listEl.scrollTop,
     highlightInList: h.top >= l.top - 2 && h.bottom <= l.bottom + 2,
   };
@@ -190,4 +190,16 @@ test('inline list opens above the field when the scrolling modal has more room t
   await nextFrames(page);
   await expect(page.getByRole('dialog')).toBeVisible();
   expect(await layout(page)).toMatchObject({ above: true, fitsInBody: true, highlightInList: true });
+});
+
+test('inline list fits and scrolls correctly inside a scaled modal', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'mobile uses the fullscreen list');
+  // Room below is 50px short of the list in CSS pixels, but would look sufficient in screen pixels.
+  await mountInModal(page, { height: 320, before: 120, after: 200, scale: 0.6 });
+  await page.getByRole('button', { name: /Select country/ }).click();
+  await nextFrames(page);
+  await expect(page.getByRole('dialog')).toBeVisible();
+  const result = await layout(page);
+  expect(result).toMatchObject({ fitsInBody: true, highlightInList: true });
+  expect(result.listScrollTop).toBeGreaterThan(0);
 });
