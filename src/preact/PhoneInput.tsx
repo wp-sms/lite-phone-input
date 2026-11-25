@@ -20,7 +20,8 @@ export interface PhoneInputRef {
 
 type WidgetProps = Omit<PhoneInputOptions, 'inputAttributes'>;
 
-type InputAttrs = Omit<JSX.HTMLAttributes<HTMLInputElement>, keyof WidgetProps | 'value' | 'defaultValue' | 'children'>;
+// IntrinsicElements['input'] exists in both Preact 10 and 11 (11 removed JSX.HTMLAttributes).
+type InputAttrs = Omit<JSX.IntrinsicElements['input'], keyof WidgetProps | 'value' | 'defaultValue' | 'children'>;
 
 export type PhoneInputProps = WidgetProps & InputAttrs;
 
