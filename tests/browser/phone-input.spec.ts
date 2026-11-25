@@ -99,3 +99,107 @@ test('widget passes automated accessibility checks closed and open', async ({ pa
   await page.getByRole('button', { name: /Select country/ }).click();
   expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()).violations).toEqual([]);
 });
+
+/** A transformed modal (centered, or pinned near the top) whose body scrolls, with the field rendered inline inside it. */
+async function mountInModal(page: Page, { height, before, after = 0, top, scale = 1 }: { height: number; before: number; after?: number; top?: number; scale?: number }) {
+  await page.evaluate(({ height, before, after, top, scale }) => {
+    const modal = document.createElement('div');
+    const place = top === undefined ? `top:50%;transform:translate(-50%,-50%) scale(${scale})` : `top:${top}px;transform:translateX(-50%) scale(${scale})`;
+    modal.style.cssText = `position:fixed;${place};left:50%;width:360px;background:#fff;border:1px solid #ccc`;
+    const body = document.createElement('div');
+    body.id = 'modal-body';
+    body.style.cssText = `height:${height}px;overflow-y:auto;padding:8px`;
+    const spacer = (h: number) => Object.assign(document.createElement('div'), { style: `height:${h}px` });
+    body.append(spacer(before), document.querySelector('#mount')!, spacer(after));
+    modal.append(body);
+    document.body.append(modal);
+  }, { height, before, after, top, scale });
+  await mount(page, { defaultCountry: 'US' });
+  await page.evaluate(() => (window as any).phone.setOptions({ dropdownContainer: document.querySelector('#mount .lpi') }));
+}
+const modalScrollTop = (page: Page) => page.evaluate(() => document.querySelector('#modal-body')!.scrollTop);
+const nextFrames = (page: Page) => page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+/** Dropdown and modal-body rects, and whether the highlighted option is inside the list. */
+const layout = (page: Page) => page.evaluate(() => {
+  const dropdown = document.querySelector('.lpi__dropdown')!;
+  const listEl = dropdown.querySelector('.lpi__list')!;
+  const body = document.querySelector('#modal-body')!;
+  const b = body.getBoundingClientRect();
+  const l = listEl.getBoundingClientRect();
+  const h = listEl.querySelector('.lpi__option--highlighted')!.getBoundingClientRect();
+  const d = dropdown.getBoundingClientRect();
+  return {
+    above: dropdown.classList.contains('lpi__dropdown--above'),
+    fitsInBody: d.top >= b.top - 1 && d.bottom <= b.bottom + 1, // modal body has no border
+    listScrollTop: listEl.scrollTop,
+    highlightInList: h.top >= l.top - 2 && h.bottom <= l.bottom + 2,
+  };
+});
+
+test('inline list inside a tiny scrolling modal stays open and does not scroll the modal (issue #4)', async ({ page }) => {
+  // Too little room either side: even the minimum-height list overflows the modal body.
+  await mountInModal(page, { height: 120, before: 40, after: 300 });
+  const trigger = page.getByRole('button', { name: /Select country/ });
+  const before = await modalScrollTop(page);
+  await trigger.click();
+  await nextFrames(page);
+  await expect(page.getByRole('dialog')).toBeVisible();
+  expect(await modalScrollTop(page)).toBe(before);
+  const search = page.getByRole('combobox', { name: 'Search countries' });
+  await search.press('ArrowDown');
+  await nextFrames(page);
+  await expect(page.getByRole('dialog')).toBeVisible();
+  expect(await modalScrollTop(page)).toBe(before);
+  // The inline list moves with the field, so scrolling the modal (here, by the user;
+  // when typing, by the browser revealing the caret) must not close it.
+  await page.locator('#modal-body').evaluate(el => { el.scrollTop = 60; });
+  await nextFrames(page);
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await search.fill('GB');
+  await expect(page.getByRole('option')).toHaveCount(1);
+  await search.press('Enter');
+  await expect(trigger).toHaveAttribute('aria-label', /United Kingdom/);
+});
+
+test('inline list shrinks to fit below the field inside a scrolling modal', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'mobile uses the fullscreen list');
+  await mountInModal(page, { height: 320, before: 120, after: 200 });
+  const trigger = page.getByRole('button', { name: /Select country/ });
+  const before = await modalScrollTop(page);
+  await trigger.click();
+  await nextFrames(page);
+  await expect(page.getByRole('dialog')).toBeVisible();
+  const result = await layout(page);
+  expect(result).toMatchObject({ above: false, fitsInBody: true, highlightInList: true });
+  expect(result.listScrollTop).toBeGreaterThan(0);
+  // The selected country is visible, so a real click needs no scrolling.
+  await page.locator('.lpi__option--highlighted').click();
+  await page.locator('#phone').focus();
+  await trigger.click();
+  await page.locator('[data-code="CA"]').click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(trigger).toHaveAttribute('aria-label', /Canada/);
+  expect(await modalScrollTop(page)).toBe(before);
+});
+
+test('inline list opens above the field when the scrolling modal has more room there', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'mobile uses the fullscreen list');
+  // The window has room below the field; only the modal body doesn't.
+  await mountInModal(page, { height: 400, before: 330, top: 20 });
+  await page.getByRole('button', { name: /Select country/ }).click();
+  await nextFrames(page);
+  await expect(page.getByRole('dialog')).toBeVisible();
+  expect(await layout(page)).toMatchObject({ above: true, fitsInBody: true, highlightInList: true });
+});
+
+test('inline list fits and scrolls correctly inside a scaled modal', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'mobile uses the fullscreen list');
+  // Room below is 50px short of the list in CSS pixels, but would look sufficient in screen pixels.
+  await mountInModal(page, { height: 320, before: 120, after: 200, scale: 0.6 });
+  await page.getByRole('button', { name: /Select country/ }).click();
+  await nextFrames(page);
+  await expect(page.getByRole('dialog')).toBeVisible();
+  const result = await layout(page);
+  expect(result).toMatchObject({ fitsInBody: true, highlightInList: true });
+  expect(result.listScrollTop).toBeGreaterThan(0);
+});
