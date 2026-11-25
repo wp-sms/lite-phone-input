@@ -9,10 +9,9 @@ updates:
       dev-dependencies:
         dependency-type: development
         update-types: [minor, patch]
-    ignore:
-      # Major upgrades need a deliberate migration (e.g. vitest 5)
-      - dependency-name: '*'
-        update-types: ['version-update:semver-major']
+    # Major upgrades are not ignored: they arrive as individual PRs so each
+    # can be reviewed (or closed with `@dependabot ignore this major version`),
+    # and an ignore rule could also hide fixes that need a major upgrade.
 
   - package-ecosystem: github-actions
     directory: /
