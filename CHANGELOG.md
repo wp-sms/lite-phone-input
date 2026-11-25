@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-25
+
 ### Changed
 
 - An inline country list (`dropdownContainer` set to the field's `.lpi` wrapper) now fits inside scrolling containers such as modal bodies: it opens above the field or shrinks when there isn't room below.
@@ -121,6 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TypeScript-first** — written in TypeScript with full type definitions
 - **Zero runtime dependencies**
 
+[0.7.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.3.0...v0.4.0
