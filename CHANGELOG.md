@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Preact `PhoneInputProps` types work with Preact 11. Previously its input attributes fell back to an untyped index signature (or reported a type error without `skipLibCheck`). With Preact 10, input-specific attributes such as `autoComplete` are now accepted.
+
 ## [0.7.0] - 2026-11-25
 
 ### Changed
