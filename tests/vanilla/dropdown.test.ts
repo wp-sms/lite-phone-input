@@ -87,6 +87,54 @@ describe('Dropdown', () => {
       const results = dropdown.search('zzzzz');
       expect(results).toHaveLength(0);
     });
+
+    it('keeps existing ordering for English queries', () => {
+      const { dropdown } = createDropdown();
+      expect(dropdown.search('united').map(c => c.code)).toEqual(['GB', 'US']);
+      expect(dropdown.search('1').map(c => c.code)).toEqual(['CA', 'US']);
+      expect(dropdown.search('an').map(c => c.code)).toEqual(['AF', 'CA', 'DE']);
+    });
+
+    it('accepts a + prefix on dial codes', () => {
+      const { dropdown } = createDropdown();
+      expect(dropdown.search('+49')[0].code).toBe('DE');
+      expect(dropdown.search('+')).toHaveLength(countries.length);
+    });
+  });
+
+  describe('search with fa-IR locale', () => {
+    const faCountries: Country[] = [
+      ...countries,
+      { code: 'IR', name: 'Iran', dialCode: '98', format: 'XXX XXX XXXX', nationalPrefix: '0', minLength: 10, maxLength: 10, priority: 0 },
+      { code: 'GR', name: 'Greece', dialCode: '30', format: 'XXX XXX XXXX', nationalPrefix: '', minLength: 10, maxLength: 10, priority: 0 },
+    ];
+    const codes = (q: string) =>
+      createDropdown({ countries: faCountries, locale: 'fa-IR' }).dropdown.search(q).map(c => c.code);
+
+    it.each([
+      ['iran', 'IR'],
+      ['germany', 'DE'],
+      ['+98', 'IR'],
+      ['۹۸', 'IR'],
+      ['+۹۸', 'IR'],
+      ['٩٨', 'IR'],
+      ['ايران', 'IR'],
+      ['ایران', 'IR'],
+      ['IR', 'IR'],
+      ['98', 'IR'],
+    ])('%s → %s first', (query, code) => {
+      expect(codes(query)[0]).toBe(code);
+    });
+
+    it('matches dial-code prefixes after exact matches', () => {
+      // No country has dial code "4"; DE (49) and GB (44) match by prefix
+      expect([...codes('+4')].sort()).toEqual(['DE', 'GB']);
+      expect(codes('+4')).toEqual(codes('۴'));
+    });
+
+    it('returns nothing for a non-matching query', () => {
+      expect(codes('zzzzz')).toHaveLength(0);
+    });
   });
 
   describe('open and close', () => {
