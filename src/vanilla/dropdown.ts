@@ -52,6 +52,8 @@ export class Dropdown {
 
   get dialogId(): string { return `lpi-dialog-${this.id}`; }
 
+  hasFocus(): boolean { return this.el?.matches(':focus-within') ?? false; }
+
   constructor(options: DropdownOptions) {
     this.options = options;
     this.id = nextId++;

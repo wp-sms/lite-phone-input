@@ -434,6 +434,25 @@ describe('PhoneInput', () => {
       phone.destroy();
     });
 
+    it('moves focus from a list closed by setOptions to the input, and leaves focus elsewhere alone', () => {
+      const outside = document.body.appendChild(document.createElement('button'));
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US', dropdownContainer: 'inline' });
+      const trigger = container.querySelector('.lpi__trigger') as HTMLButtonElement;
+      trigger.click();
+      (container.querySelector('.lpi__search') as HTMLInputElement).focus();
+
+      phone.setOptions({ dropdownContainer: document.body });
+      expect(document.activeElement).toBe(container.querySelector('.lpi__input'));
+
+      trigger.click();
+      outside.focus();
+      phone.setOptions({ dropdownContainer: 'inline' });
+      expect(document.querySelector('.lpi__dropdown')).toBeNull();
+      expect(document.activeElement).toBe(outside);
+
+      phone.destroy();
+    });
+
     it('setOptions with an unchanged dropdownContainer keeps the list open', () => {
       const phone = PhoneInput.mount(container, { defaultCountry: 'US', dropdownContainer: 'inline' });
       (container.querySelector('.lpi__trigger') as HTMLButtonElement).click();
