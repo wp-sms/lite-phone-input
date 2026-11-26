@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-11-26
+
+### Upgrade notes
+
+- React/Preact: changing the `dropdownContainer` prop after mount used to be ignored and now takes effect. If the new value differs, an open country list closes. Pass a stable element (or `'inline'`) to keep the old behavior.
+
 ### Added
 
 - `dropdownContainer: 'inline'` renders the country list inside the field's own `.lpi` wrapper, so it stays open and in place when a modal body scrolls. It works with `mount()`, `setOptions()` and the React/Preact `dropdownContainer` prop; previously the wrapper had to be passed by hand after mounting, which React and Preact couldn't do (issue #22).
@@ -137,6 +143,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **TypeScript-first** — written in TypeScript with full type definitions
 - **Zero runtime dependencies**
 
+[0.7.2]: https://github.com/wp-sms/lite-phone-input/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/wp-sms/lite-phone-input/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/wp-sms/lite-phone-input/compare/v0.5.0...v0.6.0
