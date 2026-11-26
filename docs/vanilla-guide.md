@@ -145,9 +145,9 @@ phone.setOptions({ placeholder: 'Enter your number' });
 phone.setOptions({ formatAsYouType: false });
 ```
 
-Supported dynamic options: `disabled`, `allowedCountries`, `excludedCountries`, `preferredCountries`, `allowDropdown`, `formatAsYouType`, `strict`, `separateDialCode`, `nationalMode`, `placeholder`, `locale`, `renderFlag`, `inputAttributes`.
+Supported dynamic options: `disabled`, `allowedCountries`, `excludedCountries`, `preferredCountries`, `allowDropdown`, `formatAsYouType`, `strict`, `separateDialCode`, `nationalMode`, `placeholder`, `locale`, `renderFlag`, `inputAttributes`, `dropdownContainer` (an open list closes when it changes).
 
-Mount-only options (cannot be changed via `setOptions`): `defaultCountry`, `initialValue`, `hiddenInput`, `containerClass`, `dropdownContainer`, `geoIpLookup`.
+Mount-only options (cannot be changed via `setOptions`): `defaultCountry`, `initialValue`, `hiddenInput`, `containerClass`, `geoIpLookup`.
 
 ## Multiple Instances
 

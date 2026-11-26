@@ -114,8 +114,7 @@ async function mountInModal(page: Page, { height, before, after = 0, top, scale 
     modal.append(body);
     document.body.append(modal);
   }, { height, before, after, top, scale });
-  await mount(page, { defaultCountry: 'US' });
-  await page.evaluate(() => (window as any).phone.setOptions({ dropdownContainer: document.querySelector('#mount .lpi') }));
+  await mount(page, { defaultCountry: 'US', dropdownContainer: 'inline' });
 }
 const modalScrollTop = (page: Page) => page.evaluate(() => document.querySelector('#modal-body')!.scrollTop);
 const nextFrames = (page: Page) => page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));

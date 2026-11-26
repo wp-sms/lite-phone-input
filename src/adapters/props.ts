@@ -3,11 +3,11 @@ import type { PhoneInputOptions } from '../core/types';
 export const dynamicOptionKeys = [
   'disabled', 'allowedCountries', 'excludedCountries', 'preferredCountries',
   'allowDropdown', 'formatAsYouType', 'strict', 'separateDialCode', 'nationalMode',
-  'placeholder', 'locale', 'renderFlag',
+  'placeholder', 'locale', 'renderFlag', 'dropdownContainer',
 ] as const satisfies readonly (keyof PhoneInputOptions)[];
 const widgetKeys = new Set<string>([
   ...dynamicOptionKeys, 'defaultCountry', 'hiddenInput', 'initialValue', 'containerClass',
-  'dropdownContainer', 'geoIpLookup', 'onChange', 'onCountryChange', 'onValidationChange',
+  'geoIpLookup', 'onChange', 'onCountryChange', 'onValidationChange',
   'onDropdownOpen', 'onDropdownClose', 'class', 'className', 'children', 'ref', 'key',
   'value', 'defaultValue', 'dangerouslySetInnerHTML',
 ]);

@@ -68,7 +68,8 @@ export interface PhoneInputOptions {
   inputAttributes?: Record<string, string>;
   initialValue?: string;
   containerClass?: string;
-  dropdownContainer?: HTMLElement;
+  /** Element to portal the country list into (default `document.body`), or `'inline'` to render it inside the field's `.lpi`. */
+  dropdownContainer?: HTMLElement | 'inline';
   geoIpLookup?: (callback: (countryCode: string | null) => void) => void;
 
   onChange?: (e164: string, country: Country, validation: ValidationResult) => void;

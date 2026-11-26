@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `dropdownContainer: 'inline'` renders the country list inside the field's own `.lpi` wrapper, so it stays open and in place when a modal body scrolls. It works with `mount()`, `setOptions()` and the React/Preact `dropdownContainer` prop; previously the wrapper had to be passed by hand after mounting, which React and Preact couldn't do (issue #22).
+
+### Changed
+
+- `dropdownContainer` can be changed after mount with `setOptions()` or by changing the React/Preact prop. An open list closes and opens in the new container next time.
+
 ## [0.7.1] - 2026-11-25
 
 ### Fixed
