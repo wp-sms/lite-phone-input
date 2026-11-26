@@ -222,6 +222,26 @@ describe('Preact PhoneInput', () => {
       renderInto(<PhoneInput defaultCountry="US" separateDialCode={true} />);
       expect(container.querySelector('.lpi__dial-code')).toBeTruthy();
     });
+
+    it("renders the list inside .lpi with dropdownContainer=\"inline\"", () => {
+      renderInto(<PhoneInput defaultCountry="US" dropdownContainer="inline" />);
+      act(() => (container.querySelector('.lpi__trigger') as HTMLButtonElement).click());
+
+      expect(container.querySelector('.lpi__dropdown')?.parentElement).toBe(container.querySelector('.lpi'));
+    });
+
+    it('syncs dropdownContainer prop changes', () => {
+      renderInto(<PhoneInput defaultCountry="US" />);
+      const trigger = container.querySelector('.lpi__trigger') as HTMLButtonElement;
+      act(() => trigger.click());
+      expect(document.body.lastElementChild?.classList.contains('lpi__dropdown')).toBe(true);
+
+      renderInto(<PhoneInput defaultCountry="US" dropdownContainer="inline" />);
+      expect(document.querySelector('.lpi__dropdown')).toBeNull();
+
+      act(() => trigger.click());
+      expect(container.querySelector('.lpi__dropdown')?.parentElement).toBe(container.querySelector('.lpi'));
+    });
   });
 
   describe('HTML attribute passthrough', () => {

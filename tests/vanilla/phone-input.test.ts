@@ -399,6 +399,69 @@ describe('PhoneInput', () => {
 
       phone.destroy();
     });
+
+    it("renders the list inside the field's .lpi with dropdownContainer: 'inline'", () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US', dropdownContainer: 'inline' });
+      (container.querySelector('.lpi__trigger') as HTMLButtonElement).click();
+
+      const dropdown = container.querySelector('.lpi__dropdown') as HTMLElement;
+      expect(dropdown.parentElement).toBe(container.querySelector('.lpi'));
+      expect(dropdown.style.position).not.toBe('fixed');
+
+      phone.destroy();
+    });
+
+    it('setOptions({ dropdownContainer }) closes an open list and the next open uses the new container', () => {
+      const portal = createContainer();
+      const onDropdownClose = vi.fn();
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US', dropdownContainer: portal, onDropdownClose });
+      const trigger = container.querySelector('.lpi__trigger') as HTMLButtonElement;
+      trigger.click();
+      expect(portal.querySelector('.lpi__dropdown')).toBeTruthy();
+
+      phone.setOptions({ dropdownContainer: 'inline' });
+      expect(onDropdownClose).toHaveBeenCalledTimes(1);
+      expect(document.querySelector('.lpi__dropdown')).toBeNull();
+      expect(trigger.getAttribute('aria-expanded')).toBe('false');
+
+      trigger.click();
+      expect(document.querySelector('.lpi__dropdown')?.parentElement).toBe(container.querySelector('.lpi'));
+
+      phone.setOptions({ dropdownContainer: portal });
+      trigger.click();
+      expect(document.querySelector('.lpi__dropdown')?.parentElement).toBe(portal);
+
+      phone.destroy();
+    });
+
+    it('moves focus from a list closed by setOptions to the input, and leaves focus elsewhere alone', () => {
+      const outside = document.body.appendChild(document.createElement('button'));
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US', dropdownContainer: 'inline' });
+      const trigger = container.querySelector('.lpi__trigger') as HTMLButtonElement;
+      trigger.click();
+      (container.querySelector('.lpi__search') as HTMLInputElement).focus();
+
+      phone.setOptions({ dropdownContainer: document.body });
+      expect(document.activeElement).toBe(container.querySelector('.lpi__input'));
+
+      trigger.click();
+      outside.focus();
+      phone.setOptions({ dropdownContainer: 'inline' });
+      expect(document.querySelector('.lpi__dropdown')).toBeNull();
+      expect(document.activeElement).toBe(outside);
+
+      phone.destroy();
+    });
+
+    it('setOptions with an unchanged dropdownContainer keeps the list open', () => {
+      const phone = PhoneInput.mount(container, { defaultCountry: 'US', dropdownContainer: 'inline' });
+      (container.querySelector('.lpi__trigger') as HTMLButtonElement).click();
+
+      phone.setOptions({ dropdownContainer: 'inline' });
+      expect(container.querySelector('.lpi__dropdown')).toBeTruthy();
+
+      phone.destroy();
+    });
   });
 
   describe('country filtering', () => {

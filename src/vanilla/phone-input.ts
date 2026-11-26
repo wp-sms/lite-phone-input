@@ -152,7 +152,12 @@ export class PhoneInput {
       }
       for (const [key, value] of Object.entries(next.inputAttributes ?? {})) this.inputEl.setAttribute(key, value);
     }
-    if (next.disabled || next.allowDropdown === false) this.closeDropdown();
+    // An open list stays where it is; close it so the next open uses the new container.
+    if (next.disabled || next.allowDropdown === false || next.dropdownContainer !== prev.dropdownContainer) {
+      const listHadFocus = this.dropdown?.hasFocus() ?? false;
+      this.closeDropdown();
+      if (listHadFocus && !next.disabled) this.inputEl.focus();
+    }
 
     if ('disabled' in opts) {
       this.inputEl.disabled = !!opts.disabled;
@@ -467,7 +472,8 @@ export class PhoneInput {
           this.triggerEl.focus();
         }
       },
-      container: this.opts.dropdownContainer ?? document.body,
+      container: this.opts.dropdownContainer === 'inline'
+        ? this.containerEl : this.opts.dropdownContainer ?? document.body,
     });
 
     this.dropdown.open(this.triggerEl);

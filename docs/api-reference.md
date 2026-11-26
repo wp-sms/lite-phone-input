@@ -91,7 +91,7 @@ Pass these to `PhoneInput.mount(el, options)` (vanilla) or as props (React/Preac
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `dropdownContainer` | `HTMLElement` | `document.body` | Portal target for the dropdown. Use this to solve z-index stacking issues |
+| `dropdownContainer` | `HTMLElement \| 'inline'` | `document.body` | An element to portal the dropdown into (use this to solve z-index stacking issues), or `'inline'` to render it inside the field's `.lpi` wrapper (for transformed or scrolling modals; see [Inline list](advanced.md#inline-list)). Can be changed after mount; an open list closes |
 | `containerClass` | `string` | `''` | Additional CSS class(es) added to the root `.lpi` container |
 
 ---
@@ -325,7 +325,7 @@ interface PhoneInputOptions {
   inputAttributes?: Record<string, string>;
   initialValue?: string;
   containerClass?: string;
-  dropdownContainer?: HTMLElement;
+  dropdownContainer?: HTMLElement | 'inline';
   geoIpLookup?: (callback: (countryCode: string | null) => void) => void;
 
   onChange?: (e164: string, country: Country, validation: ValidationResult) => void;

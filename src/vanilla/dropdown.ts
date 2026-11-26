@@ -19,7 +19,6 @@ const DROPDOWN_GAP = 2;
 /** Keep the search box plus a few rows usable even when little room is left. */
 const DROPDOWN_MIN_HEIGHT = 150;
 
-/** Screen pixels per CSS pixel for an element (≠ 1 inside a scale() transform). */
 /**
  * Normalize text for search: ASCII digits, Arabic ي/ى/ك folded to Persian ی/ک
  * (common on Arabic keyboard layouts), trimmed and lowercased.
@@ -32,6 +31,7 @@ function normalizeSearch(s: string): string {
     .toLowerCase();
 }
 
+/** Screen pixels per CSS pixel for an element (≠ 1 inside a scale() transform). */
 function screenScale(el: HTMLElement, box: DOMRect): number {
   return el.offsetHeight > 0 && box.height > 0 ? box.height / el.offsetHeight : 1;
 }
@@ -51,6 +51,8 @@ export class Dropdown {
   private options: DropdownOptions;
 
   get dialogId(): string { return `lpi-dialog-${this.id}`; }
+
+  hasFocus(): boolean { return this.el?.matches(':focus-within') ?? false; }
 
   constructor(options: DropdownOptions) {
     this.options = options;
